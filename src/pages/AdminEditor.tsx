@@ -39,17 +39,18 @@ const AdminEditor = () => {
     if (!isNew && id) {
       supabase.from(contentType).select("*").eq("id", id).single().then(({ data }) => {
         if (!data) return;
+        const d = data as any;
         if (contentType === "leaders") {
-          setName(data.name || "");
-          setRole(data.role || "");
-          setYears(data.years || "");
-          setInfo(data.info || "");
-          setAvatar(data.avatar || "");
+          setName(d.name || "");
+          setRole(d.role || "");
+          setYears(d.years || "");
+          setInfo(d.info || "");
+          setAvatar(d.avatar || "");
         } else {
-          setTitle(data.title || "");
-          setContent(data.content || "");
-          setHeaderImage(data.image || "");
-          if (contentType === "articles") setCategory(data.category || "");
+          setTitle(d.title || "");
+          setContent(d.content || "");
+          setHeaderImage(d.image || "");
+          if (contentType === "articles") setCategory(d.category || "");
         }
       });
     }
@@ -92,9 +93,9 @@ const AdminEditor = () => {
 
     let error;
     if (isNew) {
-      ({ error } = await supabase.from(contentType).insert(payload));
+      ({ error } = await supabase.from(contentType).insert(payload as any));
     } else {
-      ({ error } = await supabase.from(contentType).update(payload).eq("id", id!));
+      ({ error } = await supabase.from(contentType).update(payload as any).eq("id", id!));
     }
 
     setSaving(false);
