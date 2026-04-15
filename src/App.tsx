@@ -4,11 +4,11 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
-import Index from "./pages/Index.tsx";
-import NotFound from "./pages/NotFound.tsx";
-import Login from "./pages/Login.tsx";
-import Admin from "./pages/Admin.tsx";
-import AdminEditor from "./pages/AdminEditor.tsx";
+import Index from "./pages/Index";
+import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
+import Admin from "./pages/Admin";
+import AdminEditor from "./pages/AdminEditor";
 
 const queryClient = new QueryClient();
 
@@ -21,10 +21,12 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/leaders" element={<Index />} />
+            <Route path="/activities" element={<Index />} />
+            <Route path="/article/:id" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/admin/:type/:id" element={<AdminEditor />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
