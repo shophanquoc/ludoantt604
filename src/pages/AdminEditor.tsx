@@ -6,11 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import RichTextEditor from "@/components/RichTextEditor";
-import { ArrowLeft, Save, ImagePlus, X } from "lucide-react";
+import { ArrowLeft, Save, ImagePlus, X, Loader2, ShieldAlert, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type ContentType = "articles" | "activities" | "leaders";
+
+const validContentTypes: ContentType[] = ["articles", "activities", "leaders"];
 
 const AdminEditor = () => {
   const { type, id } = useParams<{ type: string; id: string }>();
@@ -30,31 +33,62 @@ const AdminEditor = () => {
   const [info, setInfo] = useState("");
   const [avatar, setAvatar] = useState("");
   const [saving, setSaving] = useState(false);
+  const [pageLoading, setPageLoading] = useState(false);
+  const [pageError, setPageError] = useState<string | null>(null);
+  const isValidType = validContentTypes.includes(contentType);
 
   useEffect(() => {
-    if (!loading && !isAdmin) navigate("/login");
+    if (!loading && !isAdmin) {
+      navigate("/admin/login", { replace: true, state: { from: `/admin/${type}/${id}` } });
+    }
   }, [loading, isAdmin, navigate]);
 
   useEffect(() => {
-    if (!isNew && id) {
-      supabase.from(contentType).select("*").eq("id", id).single().then(({ data }) => {
-        if (!data) return;
-        const d = data as any;
-        if (contentType === "leaders") {
-          setName(d.name || "");
-          setRole(d.role || "");
-          setYears(d.years || "");
-          setInfo(d.info || "");
-          setAvatar(d.avatar || "");
-        } else {
-          setTitle(d.title || "");
-          setContent(d.content || "");
-          setHeaderImage(d.image || "");
-          if (contentType === "articles") setCategory(d.category || "");
-        }
-      });
+    if (!isValidType || isNew || !id || !isAdmin) return;
+
+    const loadRecord = async () => {
+      setPageLoading(true);
+      setPageError(null);
+
+      const { data, error } = await supabase.from(contentType).select("*").eq("id", id).single();
+
+      if (error) {
+        setPageError(error.message);
+        setPageLoading(false);
+        return;
+      }
+
+      if (!data) {
+        setPageError("Không tìm thấy dữ liệu cần chỉnh sửa.");
+        setPageLoading(false);
+        return;
+      }
+
+      const d = data as any;
+      if (contentType === "leaders") {
+        setName(d.name || "");
+        setRole(d.role || "");
+        setYears(d.years || "");
+        setInfo(d.info || "");
+        setAvatar(d.avatar || "");
+      } else {
+        setTitle(d.title || "");
+        setContent(d.content || "");
+        setHeaderImage(d.image || "");
+        if (contentType === "articles") setCategory(d.category || "");
+      }
+
+      setPageLoading(false);
+    };
+
+    void loadRecord();
+  }, [id, contentType, isNew, isAdmin, isValidType]);
+
+  useEffect(() => {
+    if (!isValidType) {
+      setPageError("Loại nội dung không hợp lệ.");
     }
-  }, [id, contentType, isNew]);
+  }, [isValidType]);
 
   const uploadImage = async (file: File): Promise<string | null> => {
     const ext = file.name.split(".").pop() || "png";
@@ -107,8 +141,23 @@ const AdminEditor = () => {
     }
   };
 
-  if (loading) return <div className="flex min-h-screen items-center justify-center">Đang tải...</div>;
-  if (!isAdmin) return null;
+  if (loading) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-muted/30">
+        <Loader2 className="h-6 w-6 animate-spin" />
+        <p className="text-sm text-muted-foreground">Đang kiểm tra quyền truy cập...</p>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-muted/30 p-4 text-center">
+        <ShieldAlert className="h-8 w-8" />
+        <p className="text-sm text-muted-foreground">Bạn không có quyền truy cập. Đang chuyển về trang đăng nhập...</p>
+      </div>
+    );
+  }
 
   const typeLabels: Record<ContentType, string> = { articles: "Bài viết", activities: "Hoạt động", leaders: "Lãnh đạo" };
 
@@ -127,6 +176,27 @@ const AdminEditor = () => {
 
       <main className="mx-auto max-w-3xl p-4 space-y-6">
         <h2 className="text-xl font-bold">{isNew ? "Thêm" : "Sửa"} {typeLabels[contentType]}</h2>
+
+        {pageError && (
+          <Alert variant="destructive">
+            <ShieldAlert className="h-4 w-4" />
+            <AlertTitle>Không tải được nội dung</AlertTitle>
+            <AlertDescription className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <span>{pageError}</span>
+              {!isNew && isValidType && id && (
+                <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+                  <RefreshCw className="mr-1.5 h-4 w-4" /> Tải lại
+                </Button>
+              )}
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {pageLoading && (
+          <div className="flex items-center gap-2 rounded-lg border bg-background p-4 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" /> Đang tải dữ liệu biên tập...
+          </div>
+        )}
 
         {contentType === "leaders" ? (
           <>

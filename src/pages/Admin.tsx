@@ -6,7 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Plus, Pencil, Trash2, LogOut } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Loader2, Plus, Pencil, Trash2, LogOut, RefreshCw, ShieldAlert } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type TabType = "articles" | "activities" | "leaders";
@@ -18,21 +19,39 @@ const Admin = () => {
   const [activeTab, setActiveTab] = useState<TabType>("articles");
   const [data, setData] = useState<any[]>([]);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [dataLoading, setDataLoading] = useState(false);
+  const [dataError, setDataError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!loading && !isAdmin) navigate("/login");
+    if (!loading && !isAdmin) {
+      navigate("/admin/login", { replace: true, state: { from: "/admin" } });
+    }
   }, [loading, isAdmin, navigate]);
 
   useEffect(() => {
-    fetchData();
-  }, [activeTab]);
+    if (!loading && isAdmin) {
+      void fetchData();
+    }
+  }, [activeTab, loading, isAdmin]);
 
   const fetchData = async () => {
-    const { data: rows } = await supabase
+    setDataLoading(true);
+    setDataError(null);
+
+    const { data: rows, error } = await supabase
       .from(activeTab)
       .select("*")
       .order("created_at", { ascending: false });
+
+    if (error) {
+      setData([]);
+      setDataError(error.message);
+      setDataLoading(false);
+      return;
+    }
+
     setData(rows || []);
+    setDataLoading(false);
   };
 
   const handleDelete = async () => {
@@ -53,8 +72,23 @@ const Admin = () => {
     return [{ key: "name", label: "Họ tên" }, { key: "role", label: "Chức vụ" }, { key: "years", label: "Nhiệm kỳ" }];
   };
 
-  if (loading) return <div className="flex min-h-screen items-center justify-center">Đang tải...</div>;
-  if (!isAdmin) return null;
+  if (loading) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-muted/30">
+        <Loader2 className="h-6 w-6 animate-spin" />
+        <p className="text-sm text-muted-foreground">Đang kiểm tra quyền quản trị...</p>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-muted/30 p-4 text-center">
+        <ShieldAlert className="h-8 w-8" />
+        <p className="text-sm text-muted-foreground">Bạn không có quyền truy cập trang này. Đang chuyển về trang đăng nhập...</p>
+      </div>
+    );
+  }
 
   const tabLabels: Record<TabType, string> = { articles: "Bài viết", activities: "Hoạt động", leaders: "Lãnh đạo" };
 
@@ -64,7 +98,7 @@ const Admin = () => {
       <header className="sticky top-0 z-40 border-b bg-background px-4 py-3">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
           <h1 className="text-lg font-bold">Quản trị</h1>
-          <Button variant="ghost" size="sm" onClick={() => { signOut(); navigate("/"); }}>
+          <Button variant="ghost" size="sm" onClick={async () => { await signOut(); navigate("/"); }}>
             <LogOut className="mr-1.5 h-4 w-4" /> Thoát
           </Button>
         </div>
@@ -83,10 +117,29 @@ const Admin = () => {
             </Button>
           </div>
 
+          {dataError && (
+            <Alert className="mt-4" variant="destructive">
+              <ShieldAlert className="h-4 w-4" />
+              <AlertTitle>Không tải được dữ liệu</AlertTitle>
+              <AlertDescription className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <span>{dataError}</span>
+                <Button variant="outline" size="sm" onClick={fetchData}>
+                  <RefreshCw className="mr-1.5 h-4 w-4" /> Thử lại
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+
           {(Object.keys(tabLabels) as TabType[]).map((tab) => (
             <TabsContent key={tab} value={tab}>
               {/* Mobile cards */}
               <div className="space-y-2 sm:hidden">
+                {dataLoading && (
+                  <div className="flex items-center justify-center gap-2 rounded-lg border bg-background p-4 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" /> Đang tải dữ liệu...
+                  </div>
+                )}
+
                 {data.map((item) => (
                   <div key={item.id} className="flex items-center justify-between rounded-lg border bg-background p-3">
                     <div className="min-w-0 flex-1">
@@ -118,6 +171,16 @@ const Admin = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
+                    {dataLoading && (
+                      <TableRow>
+                        <TableCell colSpan={getColumns().length + 1} className="py-8 text-center text-muted-foreground">
+                          <div className="inline-flex items-center gap-2">
+                            <Loader2 className="h-4 w-4 animate-spin" /> Đang tải dữ liệu...
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+
                     {data.map((item) => (
                       <TableRow key={item.id}>
                         {getColumns().map((col) => (
@@ -135,7 +198,7 @@ const Admin = () => {
                         </TableCell>
                       </TableRow>
                     ))}
-                    {data.length === 0 && (
+                    {!dataLoading && data.length === 0 && (
                       <TableRow>
                         <TableCell colSpan={getColumns().length + 1} className="text-center text-muted-foreground py-8">
                           Chưa có dữ liệu

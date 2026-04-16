@@ -22,44 +22,111 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   const checkAdmin = async (userId: string) => {
-    const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
-    setIsAdmin(!!data);
+    try {
+      const { data, error } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+
+      if (error) {
+        throw error;
+      }
+
+      const admin = !!data;
+      setIsAdmin(admin);
+      return admin;
+    } catch (error) {
+      console.error("Không kiểm tra được quyền admin:", error);
+      setIsAdmin(false);
+      return false;
+    }
   };
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        await checkAdmin(session.user.id);
-      } else {
+    let active = true;
+
+    const syncSession = async (nextSession: Session | null) => {
+      if (!active) return;
+
+      setSession(nextSession);
+      setUser(nextSession?.user ?? null);
+
+      if (nextSession?.user) {
+        await checkAdmin(nextSession.user.id);
+      } else if (active) {
         setIsAdmin(false);
       }
-      setLoading(false);
-    });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        checkAdmin(session.user.id);
+      if (active) {
+        setLoading(false);
       }
-      setLoading(false);
+    };
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      void syncSession(nextSession);
     });
 
-    return () => subscription.unsubscribe();
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => syncSession(session))
+      .catch((error) => {
+        console.error("Không đọc được phiên đăng nhập:", error);
+        if (active) {
+          setUser(null);
+          setSession(null);
+          setIsAdmin(false);
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error as Error | null };
+    try {
+      setLoading(true);
+
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        return { error: error as Error };
+      }
+
+      if (!data.user) {
+        await supabase.auth.signOut();
+        return { error: new Error("Không tìm thấy thông tin tài khoản sau khi đăng nhập.") };
+      }
+
+      const admin = await checkAdmin(data.user.id);
+
+      if (!admin) {
+        await supabase.auth.signOut();
+        setUser(null);
+        setSession(null);
+        setIsAdmin(false);
+        return { error: new Error("Tài khoản này không có quyền quản trị.") };
+      }
+
+      setUser(data.user);
+      setSession(data.session ?? null);
+      return { error: null };
+    } catch (error) {
+      return {
+        error: error instanceof Error ? error : new Error("Không thể đăng nhập lúc này."),
+      };
+    } finally {
+      setLoading(false);
+    }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setSession(null);
-    setIsAdmin(false);
+    try {
+      await supabase.auth.signOut();
+    } finally {
+      setUser(null);
+      setSession(null);
+      setIsAdmin(false);
+      setLoading(false);
+    }
   };
 
   return (
