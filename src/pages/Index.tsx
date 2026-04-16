@@ -189,7 +189,7 @@ const Index = () => {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <button className="text-left" onClick={() => navigate("/")}>
             <p className="text-lg font-semibold">Lữ đoàn Thông tin 604</p>
-            <p className="text-sm text-muted-foreground">Cổng thông tin nội dung</p>
+            <p className="text-sm text-muted-foreground">Trang thông tin nội dung</p>
           </button>
 
           <nav className="hidden items-center gap-2 md:flex">
@@ -220,8 +220,8 @@ const Index = () => {
             <SheetContent side="left" className="w-[300px] p-0">
               <div className="flex h-full flex-col">
                 <div className="p-6">
-                  <p className="text-lg font-semibold">Điều hướng</p>
-                  <p className="text-sm text-muted-foreground">Chọn chuyên mục hoặc vào trang quản trị.</p>
+                  <p className="text-lg font-semibold">Lữ đoàn Thông tin 604 - QK2</p>
+                  <p className="text-sm text-muted-foreground">Trang thông tin nội dung và lịch sử hình thành</p>
                 </div>
                 <Separator />
                 <div className="flex-1 space-y-2 p-4">
@@ -270,16 +270,16 @@ const Index = () => {
           <section className="grid gap-6 rounded-3xl border bg-gradient-to-br from-background to-muted/60 p-6 md:grid-cols-[1.2fr_0.8fr] md:p-8">
             <div className="space-y-4">
               <Badge variant="outline">Trang chủ</Badge>
-              <h1 className="text-3xl font-semibold tracking-tight md:text-5xl">Tin tức, hoạt động và đội ngũ lãnh đạo được cập nhật tập trung.</h1>
+              <h1 className="text-3xl font-semibold tracking-tight md:text-5xl">Tin tức và hoạt động đơn vị.</h1>
               <p className="max-w-2xl text-base text-muted-foreground md:text-lg">
-                Giao diện mới tải dữ liệu trực tiếp từ backend, có trạng thái lỗi rõ ràng và không còn trắng trang khi nội dung đang tải.
+                Lữ đoàn Thông tin 604 tiền thân là Trung đoàn Thông tin 604, được thành lập ngày 9-9-1978, tại xã An Tường, huyện Yên Sơn, tỉnh Hà Tuyên (nay thuộc Phường An Tường, thành phố Tuyên Quang, tỉnh Tuyên Quang), là đơn vị binh chủng, bảo đảm thông tin liên lạc phục vụ Đảng ủy, Bộ tư lệnh Quân khu lãnh đạo, chỉ huy, chỉ đạo các cơ quan, đơn vị trong LLVT Quân khu 2 thực hiện nhiệm vụ quân sự, quốc phòng và liên lạc với cấp trên.
               </p>
               <div className="flex flex-wrap gap-3">
                 <Button asChild>
                   <Link to="/activities">Xem hoạt động</Link>
                 </Button>
                 <Button asChild variant="outline">
-                  <Link to="/leaders">Xem lãnh đạo</Link>
+                  <Link to="/leaders">Xem lãnh đạo </Link>
                 </Button>
               </div>
             </div>
@@ -302,7 +302,7 @@ const Index = () => {
               {featuredArticle && (
                 <CardContent>
                   <Button asChild variant="outline">
-                    <Link to={`/article/${featuredArticle.id}`}>Đọc bài viết</Link>
+                    <Link to={`/article/${featuredArticle.id}`}>Xem chi tiết</Link>
                   </Button>
                 </CardContent>
               )}
@@ -350,9 +350,9 @@ const Index = () => {
         ) : isLeadersPage ? (
           <section className="space-y-6">
             <div className="space-y-2">
-              <Badge variant="outline">Lãnh đạo</Badge>
-              <h1 className="text-3xl font-semibold tracking-tight">Ban lãnh đạo</h1>
-              <p className="text-muted-foreground">Hiển thị hồ sơ lãnh đạo trực tiếp từ dữ liệu quản trị.</p>
+              <Badge variant="outline">Lãnh đạo đơn vị</Badge>
+              <h1 className="text-3xl font-semibold tracking-tight">Lãnh đạo qua từng thời kỳ</h1>
+              <p className="text-muted-foreground">Hiển thị hồ sơ lãnh đạo qua từng thời kỳ từ dữ liệu quản trị.</p>
             </div>
             {loading ? renderLoading() : leaders.length ? <div className="grid gap-4 md:grid-cols-2">{leaders.map(renderLeaderCard)}</div> : renderEmpty("Chưa có dữ liệu lãnh đạo", "Bạn có thể thêm hồ sơ lãnh đạo từ trang quản trị.")}
           </section>
@@ -383,7 +383,7 @@ const Index = () => {
               <div className="space-y-4">
                 <div>
                   <h2 className="text-2xl font-semibold">Lãnh đạo</h2>
-                  <p className="text-sm text-muted-foreground">Thông tin đội ngũ lãnh đạo hiện tại.</p>
+                  <p className="text-sm text-muted-foreground">Lãnh đạo qua từng thời kỳ.</p>
                 </div>
                 {loading ? renderLoading() : leaders.length ? leaders.slice(0, 4).map(renderLeaderCard) : renderEmpty("Chưa có hồ sơ lãnh đạo", "Hãy cập nhật hồ sơ lãnh đạo trong trang quản trị.")}
               </div>
@@ -397,7 +397,7 @@ const Index = () => {
           <p>Lữ đoàn Thông tin 604</p>
           <div className="flex items-center gap-3">
             <ShieldCheck className="h-4 w-4" />
-            <span>Trạng thái UX đã được cải thiện: có loading, lỗi và empty state rõ ràng.</span>
+            <span>Copyright 2026. All rights reserved.</span>
           </div>
         </div>
       </footer>
