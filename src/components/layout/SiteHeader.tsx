@@ -84,6 +84,17 @@ const SiteHeader = () => {
           {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </Button>
 
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={goAdmin}
+          className="hidden md:inline-flex"
+          aria-label={isAdmin ? "Vào quản trị" : "Đăng nhập admin"}
+        >
+          <LogIn className="mr-1.5 h-4 w-4" />
+          {isAdmin ? "Quản trị" : "Đăng nhập"}
+        </Button>
+
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <Button variant="outline" size="icon" className="ml-auto md:ml-0 lg:hidden" aria-label="Mở menu">
