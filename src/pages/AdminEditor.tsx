@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import RichTextEditor from "@/components/RichTextEditor";
-import { ArrowLeft, Save, ImagePlus, X, Loader2, ShieldAlert, RefreshCw } from "lucide-react";
+import { ArrowLeft, Save, ImagePlus, X, Loader2, ShieldAlert, RefreshCw, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type ContentType = "articles" | "activities" | "leaders";
@@ -164,13 +164,19 @@ const AdminEditor = () => {
   return (
     <div className="min-h-screen bg-muted/30">
       <header className="sticky top-0 z-40 border-b bg-background px-4 py-3">
-        <div className="mx-auto flex max-w-3xl items-center justify-between">
+        <div className="mx-auto flex max-w-3xl items-center justify-between gap-2">
           <Button variant="ghost" size="sm" onClick={() => navigate("/admin")}>
             <ArrowLeft className="mr-1.5 h-4 w-4" /> Quay lại
           </Button>
-          <Button size="sm" onClick={handleSave} disabled={saving}>
-            <Save className="mr-1.5 h-4 w-4" /> {saving ? "Đang lưu..." : "Lưu"}
-          </Button>
+          <div className="flex items-center gap-1.5">
+            <Button variant="outline" size="sm" onClick={() => navigate("/")}>
+              <Home className="mr-1.5 h-4 w-4" />
+              <span className="hidden sm:inline">Trang chủ</span>
+            </Button>
+            <Button size="sm" onClick={handleSave} disabled={saving}>
+              <Save className="mr-1.5 h-4 w-4" /> {saving ? "Đang lưu..." : "Lưu"}
+            </Button>
+          </div>
         </div>
       </header>
 

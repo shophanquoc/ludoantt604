@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Plus, Pencil, Trash2, LogOut, RefreshCw, ShieldAlert } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, LogOut, RefreshCw, ShieldAlert, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type TabType = "articles" | "activities" | "leaders";
@@ -96,11 +96,18 @@ const Admin = () => {
     <div className="min-h-screen bg-muted/30">
       {/* Header */}
       <header className="sticky top-0 z-40 border-b bg-background px-4 py-3">
-        <div className="mx-auto flex max-w-5xl items-center justify-between">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-2">
           <h1 className="text-lg font-bold">Quản trị</h1>
-          <Button variant="ghost" size="sm" onClick={async () => { await signOut(); navigate("/"); }}>
-            <LogOut className="mr-1.5 h-4 w-4" /> Thoát
-          </Button>
+          <div className="flex items-center gap-1.5">
+            <Button variant="outline" size="sm" onClick={() => navigate("/")}>
+              <Home className="mr-1.5 h-4 w-4" />
+              <span className="hidden sm:inline">Quay về trang chủ</span>
+              <span className="sm:hidden">Trang chủ</span>
+            </Button>
+            <Button variant="ghost" size="sm" onClick={async () => { await signOut(); navigate("/"); }}>
+              <LogOut className="mr-1.5 h-4 w-4" /> Thoát
+            </Button>
+          </div>
         </div>
       </header>
 
