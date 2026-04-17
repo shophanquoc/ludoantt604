@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { LogIn, ShieldCheck } from "lucide-react";
+import { Home, LogIn, ShieldCheck } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -69,6 +70,11 @@ const Login = () => {
             </div>
             <Button type="submit" className="w-full" disabled={submitting || loading}>
               {submitting || loading ? "Đang đăng nhập..." : "Đăng nhập"}
+            </Button>
+            <Button asChild type="button" variant="ghost" className="w-full">
+              <Link to="/">
+                <Home className="mr-1.5 h-4 w-4" /> Quay về trang chủ
+              </Link>
             </Button>
             <p className="text-center text-sm text-muted-foreground">
               Nếu đăng nhập thành công nhưng vẫn không vào được trang quản trị, hãy kiểm tra tài khoản đã được gán role <strong>admin</strong> chưa.
