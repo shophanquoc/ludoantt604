@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import SiteHeader from "@/components/layout/SiteHeader";
@@ -12,11 +12,30 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowLeft, ArrowRight, CalendarDays, Newspaper, RefreshCw } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ArrowLeft, ArrowRight, CalendarDays, Newspaper, RefreshCw, Search } from "lucide-react";
 
 type Article = Tables<"articles">;
 type Activity = Tables<"activities">;
 type Leader = Tables<"leaders">;
+
+type ContentItem = {
+  id: string;
+  kind: "article" | "activity";
+  title: string;
+  content: string;
+  image: string | null;
+  category: string | null;
+  created_at: string;
+  href: string;
+};
 
 const stripHtml = (value: string) => value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 
@@ -31,16 +50,40 @@ const getInitials = (value: string) =>
     .map((part) => part[0]?.toUpperCase())
     .join("");
 
+const TIME_OPTIONS = [
+  { value: "all", label: "Tất cả thời gian" },
+  { value: "7d", label: "7 ngày qua" },
+  { value: "30d", label: "30 ngày qua" },
+  { value: "90d", label: "3 tháng qua" },
+  { value: "365d", label: "1 năm qua" },
+];
+
+const withinTimeFilter = (createdAt: string, range: string) => {
+  if (range === "all") return true;
+  const days = parseInt(range, 10);
+  if (Number.isNaN(days)) return true;
+  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+  return new Date(createdAt).getTime() >= cutoff;
+};
+
 const Index = () => {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [articles, setArticles] = useState<Article[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [leaders, setLeaders] = useState<Leader[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const queryParam = searchParams.get("q") || "";
+  const categoryParam = searchParams.get("cat") || "all";
+  const timeParam = searchParams.get("time") || "all";
+
+  const [searchInput, setSearchInput] = useState(queryParam);
+  useEffect(() => setSearchInput(queryParam), [queryParam]);
 
   const loadContent = async () => {
     setLoading(true);
@@ -75,59 +118,113 @@ const Index = () => {
     [articles],
   );
 
-  const featuredArticle = visibleArticles[0] || null;
+  // Normalize articles + activities into a unified shape
+  const articleItems: ContentItem[] = useMemo(
+    () =>
+      visibleArticles.map((a) => ({
+        id: a.id,
+        kind: "article",
+        title: a.title,
+        content: a.content,
+        image: a.image,
+        category: a.category,
+        created_at: a.created_at,
+        href: `/article/${a.id}`,
+      })),
+    [visibleArticles],
+  );
+
+  const activityItems: ContentItem[] = useMemo(
+    () =>
+      activities.map((a) => ({
+        id: a.id,
+        kind: "activity",
+        title: a.title,
+        content: a.content,
+        image: a.image,
+        category: "Hoạt động",
+        created_at: a.created_at,
+        href: `/activity/${a.id}`,
+      })),
+    [activities],
+  );
+
+  const articleCategories = useMemo(() => {
+    const set = new Set<string>();
+    articleItems.forEach((a) => a.category && set.add(a.category));
+    return Array.from(set);
+  }, [articleItems]);
+
+  const filterItems = (items: ContentItem[]) => {
+    const q = queryParam.trim().toLowerCase();
+    return items.filter((item) => {
+      if (categoryParam !== "all" && item.category !== categoryParam) return false;
+      if (!withinTimeFilter(item.created_at, timeParam)) return false;
+      if (q) {
+        const haystack = `${item.title} ${stripHtml(item.content)}`.toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
+      return true;
+    });
+  };
+
+  const filteredArticles = useMemo(() => filterItems(articleItems), [articleItems, queryParam, categoryParam, timeParam]);
+  const filteredActivities = useMemo(() => filterItems(activityItems), [activityItems, queryParam, categoryParam, timeParam]);
+
   const currentArticle = useMemo(
     () => articles.find((article) => article.id === id) || null,
     [articles, id],
   );
+  const currentActivity = useMemo(
+    () => activities.find((a) => a.id === id) || null,
+    [activities, id],
+  );
 
   const isArticlePage = location.pathname.startsWith("/article/");
+  const isActivityDetail = location.pathname.startsWith("/activity/");
   const isActivitiesPage = location.pathname === "/activities";
   const isLeadersPage = location.pathname === "/leaders";
   const isNewsPage = location.pathname === "/tin-tuc";
-  const isHome = !isArticlePage && !isActivitiesPage && !isLeadersPage && !isNewsPage;
+  const isHome = !isArticlePage && !isActivityDetail && !isActivitiesPage && !isLeadersPage && !isNewsPage;
 
-  const renderArticleCard = (article: Article) => (
-    <Card key={article.id} className="overflow-hidden border-border/80 transition-shadow hover:shadow-md">
-      {article.image && (
-        <Link to={`/article/${article.id}`} className="block">
-          <img src={article.image} alt={article.title} className="h-48 w-full object-cover" loading="lazy" />
+  const updateParam = (key: string, value: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (!value || value === "all") next.delete(key);
+    else next.set(key, value);
+    setSearchParams(next, { replace: true });
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateParam("q", searchInput.trim());
+  };
+
+  const renderItemCard = (item: ContentItem) => (
+    <Card key={`${item.kind}-${item.id}`} className="overflow-hidden border-border/80 transition-shadow hover:shadow-md">
+      {item.image && (
+        <Link to={item.href} className="block">
+          <img src={item.image} alt={item.title} className="h-48 w-full object-cover" loading="lazy" />
         </Link>
       )}
       <CardHeader>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Badge variant="outline">{article.category || "Tin tức"}</Badge>
-          <span>{formatDate(article.created_at)}</span>
+          <Badge variant="outline">{item.category || (item.kind === "activity" ? "Hoạt động" : "Tin tức")}</Badge>
+          <span>{formatDate(item.created_at)}</span>
         </div>
         <CardTitle className="font-display text-xl leading-snug">
-          <Link to={`/article/${article.id}`} className="hover:text-primary">
-            {article.title}
+          <Link to={item.href} className="hover:text-primary">
+            {item.title}
           </Link>
         </CardTitle>
-        <CardDescription>{stripHtml(article.content).slice(0, 140) || "Chưa có nội dung tóm tắt."}</CardDescription>
+        <CardDescription>{stripHtml(item.content).slice(0, 140) || "Chưa có nội dung tóm tắt."}</CardDescription>
       </CardHeader>
       <CardContent>
         <Button asChild variant="outline">
-          <Link to={`/article/${article.id}`}>
-            Xem chi tiết <ArrowRight className="h-4 w-4" />
+          <Link to={item.href}>
+            Xem thêm <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>
       </CardContent>
-    </Card>
-  );
-
-  const renderActivityCard = (activity: Activity) => (
-    <Card key={activity.id} className="border-border/80">
-      <CardHeader>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <CalendarDays className="h-3.5 w-3.5" />
-          <span>{formatDate(activity.created_at)}</span>
-        </div>
-        <CardTitle className="font-display text-lg leading-snug">{activity.title}</CardTitle>
-        <CardDescription>
-          {stripHtml(activity.content).slice(0, 160) || "Chưa có mô tả hoạt động."}
-        </CardDescription>
-      </CardHeader>
     </Card>
   );
 
@@ -181,6 +278,48 @@ const Index = () => {
     </Card>
   );
 
+  const renderFilters = (categories: string[], showCategory = true) => (
+    <div className="flex flex-col gap-3 rounded-xl border border-border/60 bg-muted/30 p-4 md:flex-row md:items-center">
+      <form onSubmit={handleSearchSubmit} className="flex flex-1 items-center gap-2">
+        <div className="relative flex-1">
+          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="Tìm theo từ khoá..."
+            className="h-9 pl-8"
+          />
+        </div>
+        <Button type="submit" size="sm">Tìm</Button>
+      </form>
+      <div className="flex flex-wrap gap-2">
+        {showCategory && categories.length > 0 && (
+          <Select value={categoryParam} onValueChange={(v) => updateParam("cat", v)}>
+            <SelectTrigger className="h-9 w-[160px]"><SelectValue placeholder="Chuyên mục" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả chuyên mục</SelectItem>
+              {categories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        )}
+        <Select value={timeParam} onValueChange={(v) => updateParam("time", v)}>
+          <SelectTrigger className="h-9 w-[170px]"><SelectValue placeholder="Thời gian" /></SelectTrigger>
+          <SelectContent>
+            {TIME_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  );
+
+  // Related articles (exclude current id, share category if available)
+  const getRelated = (currentId: string, category: string | null, pool: ContentItem[]) => {
+    const others = pool.filter((p) => p.id !== currentId);
+    const sameCat = category ? others.filter((p) => p.category === category) : [];
+    const merged = [...sameCat, ...others.filter((p) => !sameCat.includes(p))];
+    return merged.slice(0, 3);
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <SiteHeader />
@@ -201,46 +340,70 @@ const Index = () => {
             </Alert>
           )}
 
-          {isArticlePage ? (
-            <section className="space-y-6">
-              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-                <ArrowLeft className="mr-1.5 h-4 w-4" /> Quay lại
-              </Button>
-              {loading ? (
-                renderLoading()
-              ) : currentArticle ? (
-                <article className="space-y-6">
-                  {currentArticle.image && (
-                    <img
-                      src={currentArticle.image}
-                      alt={currentArticle.title}
-                      className="max-h-[460px] w-full rounded-3xl object-cover"
-                    />
+          {isArticlePage || isActivityDetail ? (
+            (() => {
+              const detail = isArticlePage ? currentArticle : currentActivity;
+              const category = isArticlePage ? currentArticle?.category ?? null : "Hoạt động";
+              const relatedPool = isArticlePage ? articleItems : activityItems;
+              const related = id ? getRelated(id, category, relatedPool) : [];
+              return (
+                <section className="space-y-6">
+                  <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+                    <ArrowLeft className="mr-1.5 h-4 w-4" /> Quay lại
+                  </Button>
+                  {loading ? (
+                    renderLoading()
+                  ) : detail ? (
+                    <>
+                      <article className="space-y-6">
+                        {detail.image && (
+                          <img
+                            src={detail.image}
+                            alt={detail.title}
+                            className="max-h-[460px] w-full rounded-3xl object-cover"
+                          />
+                        )}
+                        <div className="space-y-3">
+                          <Badge variant="outline">{category || "Bài viết"}</Badge>
+                          <h1 className="font-display text-3xl font-bold tracking-tight md:text-4xl">
+                            {detail.title}
+                          </h1>
+                          <p className="text-sm text-muted-foreground">
+                            Cập nhật ngày {formatDate(detail.created_at)}
+                          </p>
+                        </div>
+                        <Card>
+                          <CardContent className="p-6">
+                            <div
+                              className="space-y-4 text-sm leading-7 [&_h2]:text-2xl [&_h2]:font-semibold [&_img]:my-4 [&_img]:rounded-xl [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
+                              dangerouslySetInnerHTML={{
+                                __html: detail.content || "<p>Chưa có nội dung.</p>",
+                              }}
+                            />
+                          </CardContent>
+                        </Card>
+                      </article>
+
+                      {related.length > 0 && (
+                        <section className="space-y-4 pt-6">
+                          <h2 className="font-display text-2xl font-bold">
+                            {isArticlePage ? "Bài viết liên quan" : "Hoạt động khác"}
+                          </h2>
+                          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                            {related.map(renderItemCard)}
+                          </div>
+                        </section>
+                      )}
+                    </>
+                  ) : (
+                    renderEmpty(
+                      isArticlePage ? "Không tìm thấy bài viết" : "Không tìm thấy hoạt động",
+                      "Nội dung này có thể đã bị xoá hoặc chưa được tải về.",
+                    )
                   )}
-                  <div className="space-y-3">
-                    <Badge variant="outline">{currentArticle.category || "Bài viết"}</Badge>
-                    <h1 className="font-display text-3xl font-bold tracking-tight md:text-4xl">
-                      {currentArticle.title}
-                    </h1>
-                    <p className="text-sm text-muted-foreground">
-                      Cập nhật ngày {formatDate(currentArticle.created_at)}
-                    </p>
-                  </div>
-                  <Card>
-                    <CardContent className="p-6">
-                      <div
-                        className="space-y-4 text-sm leading-7 [&_h2]:text-2xl [&_h2]:font-semibold [&_img]:my-4 [&_img]:rounded-xl [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
-                        dangerouslySetInnerHTML={{
-                          __html: currentArticle.content || "<p>Chưa có nội dung.</p>",
-                        }}
-                      />
-                    </CardContent>
-                  </Card>
-                </article>
-              ) : (
-                renderEmpty("Không tìm thấy bài viết", "Bài viết này có thể đã bị xoá hoặc chưa được tải về.")
-              )}
-            </section>
+                </section>
+              );
+            })()
           ) : isNewsPage ? (
             <section className="space-y-6">
               <div className="space-y-2">
@@ -248,11 +411,12 @@ const Index = () => {
                 <h1 className="font-display text-3xl font-bold tracking-tight">Bản tin đơn vị</h1>
                 <p className="text-muted-foreground">Tổng hợp tin tức mới nhất từ Lữ đoàn.</p>
               </div>
+              {renderFilters(articleCategories)}
               {loading
                 ? renderLoading()
-                : visibleArticles.length
-                  ? <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{visibleArticles.map(renderArticleCard)}</div>
-                  : renderEmpty("Chưa có bài viết", "Tin tức sẽ được cập nhật tại đây.")}
+                : filteredArticles.length
+                  ? <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{filteredArticles.map(renderItemCard)}</div>
+                  : renderEmpty("Không có kết quả", "Hãy thử thay đổi từ khoá hoặc bộ lọc.")}
             </section>
           ) : isActivitiesPage ? (
             <section className="space-y-6">
@@ -261,11 +425,12 @@ const Index = () => {
                 <h1 className="font-display text-3xl font-bold tracking-tight">Danh sách hoạt động</h1>
                 <p className="text-muted-foreground">Tổng hợp các hoạt động mới nhất.</p>
               </div>
+              {renderFilters([], false)}
               {loading
                 ? renderLoading()
-                : activities.length
-                  ? <div className="grid gap-4 md:grid-cols-2">{activities.map(renderActivityCard)}</div>
-                  : renderEmpty("Chưa có hoạt động", "Khi quản trị viên thêm hoạt động mới, danh sách sẽ cập nhật tại đây.")}
+                : filteredActivities.length
+                  ? <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{filteredActivities.map(renderItemCard)}</div>
+                  : renderEmpty("Không có kết quả", "Hãy thử thay đổi từ khoá hoặc bộ lọc.")}
             </section>
           ) : isLeadersPage ? (
             <section className="space-y-6">
@@ -282,6 +447,9 @@ const Index = () => {
             </section>
           ) : (
             <div className="space-y-12">
+              {/* Homepage filter */}
+              {(articleItems.length > 0 || activityItems.length > 0) && renderFilters(articleCategories)}
+
               {/* Featured news */}
               <section className="space-y-4">
                 <div className="flex items-end justify-between gap-4">
@@ -298,16 +466,16 @@ const Index = () => {
 
                 {loading ? (
                   renderLoading()
-                ) : visibleArticles.length ? (
+                ) : filteredArticles.length ? (
                   <>
-                    {featuredArticle && (
+                    {filteredArticles[0] && (
                       <Card className="overflow-hidden border-border/80">
                         <div className="grid md:grid-cols-2">
-                          {featuredArticle.image ? (
-                            <Link to={`/article/${featuredArticle.id}`}>
+                          {filteredArticles[0].image ? (
+                            <Link to={filteredArticles[0].href}>
                               <img
-                                src={featuredArticle.image}
-                                alt={featuredArticle.title}
+                                src={filteredArticles[0].image}
+                                alt={filteredArticles[0].title}
                                 className="h-full max-h-80 w-full object-cover"
                               />
                             </Link>
@@ -318,20 +486,20 @@ const Index = () => {
                           )}
                           <div className="flex flex-col justify-center p-6 md:p-8">
                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                              <Badge variant="outline">{featuredArticle.category || "Tin tức"}</Badge>
-                              <span>{formatDate(featuredArticle.created_at)}</span>
+                              <Badge variant="outline">{filteredArticles[0].category || "Tin tức"}</Badge>
+                              <span>{formatDate(filteredArticles[0].created_at)}</span>
                             </div>
                             <h3 className="mt-3 font-display text-2xl font-semibold leading-snug md:text-3xl">
-                              <Link to={`/article/${featuredArticle.id}`} className="hover:text-primary">
-                                {featuredArticle.title}
+                              <Link to={filteredArticles[0].href} className="hover:text-primary">
+                                {filteredArticles[0].title}
                               </Link>
                             </h3>
                             <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">
-                              {stripHtml(featuredArticle.content).slice(0, 220) || "Chưa có nội dung tóm tắt."}
+                              {stripHtml(filteredArticles[0].content).slice(0, 220) || "Chưa có nội dung tóm tắt."}
                             </p>
                             <div className="mt-5">
                               <Button asChild>
-                                <Link to={`/article/${featuredArticle.id}`}>
+                                <Link to={filteredArticles[0].href}>
                                   Đọc bài viết <ArrowRight className="h-4 w-4" />
                                 </Link>
                               </Button>
@@ -342,38 +510,43 @@ const Index = () => {
                     )}
 
                     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                      {visibleArticles.slice(1, 7).map(renderArticleCard)}
+                      {filteredArticles.slice(1, 7).map(renderItemCard)}
                     </div>
                   </>
                 ) : (
-                  renderEmpty("Chưa có bài viết", "Hiện chưa có bài viết nào được xuất bản.")
+                  renderEmpty("Không có bài viết phù hợp", "Hãy thử bỏ bộ lọc hoặc tìm từ khoá khác.")
                 )}
               </section>
 
-              <section className="grid gap-8 lg:grid-cols-2">
-                <div className="space-y-4">
+              <section className="space-y-4">
+                <div className="flex items-end justify-between gap-4">
                   <div>
                     <h2 className="font-display text-2xl font-bold">Hoạt động gần đây</h2>
                     <p className="text-sm text-muted-foreground">Theo dõi các hoạt động mới nhất.</p>
                   </div>
-                  {loading
-                    ? renderLoading()
-                    : activities.length
-                      ? activities.slice(0, 3).map(renderActivityCard)
-                      : renderEmpty("Chưa có hoạt động", "Danh sách hoạt động đang trống.")}
+                  <Button asChild variant="ghost" size="sm">
+                    <Link to="/activities">
+                      Xem tất cả <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
                 </div>
+                {loading
+                  ? renderLoading()
+                  : filteredActivities.length
+                    ? <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{filteredActivities.slice(0, 3).map(renderItemCard)}</div>
+                    : renderEmpty("Chưa có hoạt động", "Danh sách hoạt động đang trống.")}
+              </section>
 
-                <div className="space-y-4">
-                  <div>
-                    <h2 className="font-display text-2xl font-bold">Lãnh đạo</h2>
-                    <p className="text-sm text-muted-foreground">Lãnh đạo đơn vị qua từng thời kỳ.</p>
-                  </div>
-                  {loading
-                    ? renderLoading()
-                    : leaders.length
-                      ? leaders.slice(0, 3).map(renderLeaderCard)
-                      : renderEmpty("Chưa có dữ liệu", "Hồ sơ lãnh đạo sẽ hiển thị tại đây.")}
+              <section className="space-y-4">
+                <div>
+                  <h2 className="font-display text-2xl font-bold">Lãnh đạo</h2>
+                  <p className="text-sm text-muted-foreground">Lãnh đạo đơn vị qua từng thời kỳ.</p>
                 </div>
+                {loading
+                  ? renderLoading()
+                  : leaders.length
+                    ? <div className="grid gap-4 md:grid-cols-2">{leaders.slice(0, 4).map(renderLeaderCard)}</div>
+                    : renderEmpty("Chưa có dữ liệu", "Hồ sơ lãnh đạo sẽ hiển thị tại đây.")}
               </section>
             </div>
           )}
