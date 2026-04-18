@@ -5,6 +5,7 @@ import type { Tables } from "@/integrations/supabase/types";
 import SiteHeader from "@/components/layout/SiteHeader";
 import SiteFooter from "@/components/layout/SiteFooter";
 import ScrollToTop from "@/components/layout/ScrollToTop";
+import LeadersTimeline from "@/components/LeadersTimeline";
 import Hero from "@/components/layout/Hero";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -375,7 +376,7 @@ const Index = () => {
                         <Card>
                           <CardContent className="p-6">
                             <div
-                              className="space-y-4 text-sm leading-7 [&_h2]:text-2xl [&_h2]:font-semibold [&_img]:my-4 [&_img]:rounded-xl [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
+                              className="prose-content space-y-4 text-sm leading-7 [&_h2]:text-2xl [&_h2]:font-semibold [&_img]:my-4 [&_img]:rounded-xl [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
                               dangerouslySetInnerHTML={{
                                 __html: detail.content || "<p>Chưa có nội dung.</p>",
                               }}
@@ -437,12 +438,12 @@ const Index = () => {
               <div className="space-y-2">
                 <Badge variant="outline">Lãnh đạo đơn vị</Badge>
                 <h1 className="font-display text-3xl font-bold tracking-tight">Lãnh đạo qua từng thời kỳ</h1>
-                <p className="text-muted-foreground">Hồ sơ lãnh đạo qua từng thời kỳ.</p>
+                <p className="text-muted-foreground">Bấm vào một mục để xem chi tiết. Mới nhất ở trên.</p>
               </div>
               {loading
                 ? renderLoading()
                 : leaders.length
-                  ? <div className="grid gap-4 md:grid-cols-2">{leaders.map(renderLeaderCard)}</div>
+                  ? <LeadersTimeline leaders={leaders} />
                   : renderEmpty("Chưa có dữ liệu lãnh đạo", "Bạn có thể thêm hồ sơ lãnh đạo từ trang quản trị.")}
             </section>
           ) : (
