@@ -376,7 +376,7 @@ const Index = () => {
                         <Card>
                           <CardContent className="p-6">
                             <div
-                              className="space-y-4 text-sm leading-7 [&_h2]:text-2xl [&_h2]:font-semibold [&_img]:my-4 [&_img]:rounded-xl [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
+                              className="prose-content space-y-4 text-sm leading-7 [&_h2]:text-2xl [&_h2]:font-semibold [&_img]:my-4 [&_img]:rounded-xl [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
                               dangerouslySetInnerHTML={{
                                 __html: detail.content || "<p>Chưa có nội dung.</p>",
                               }}
