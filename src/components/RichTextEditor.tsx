@@ -72,7 +72,7 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
     if (!editor) return;
     const current = editor.getHTML();
     if (content && content !== current) {
-      editor.commands.setContent(content, false);
+      editor.commands.setContent(content);
     }
   }, [content, editor]);
 
