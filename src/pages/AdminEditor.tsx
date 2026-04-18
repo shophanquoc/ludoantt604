@@ -18,6 +18,8 @@ const validContentTypes: ContentType[] = ["articles", "activities", "leaders"];
 const AdminEditor = () => {
   const { type, id } = useParams<{ type: string; id: string }>();
   const contentType = type as ContentType;
+  // Special case: editing the pinned "Lịch sử lữ đoàn" article via slug
+  const isHistorySlug = contentType === "articles" && id === "lich-su";
   const isNew = id === "new";
   const navigate = useNavigate();
   const { isAdmin, loading } = useAuth();
@@ -32,6 +34,7 @@ const AdminEditor = () => {
   const [years, setYears] = useState("");
   const [info, setInfo] = useState("");
   const [avatar, setAvatar] = useState("");
+  const [recordId, setRecordId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [pageLoading, setPageLoading] = useState(false);
   const [pageError, setPageError] = useState<string | null>(null);
@@ -50,7 +53,11 @@ const AdminEditor = () => {
       setPageLoading(true);
       setPageError(null);
 
-      const { data, error } = await supabase.from(contentType).select("*").eq("id", id).single();
+      // For the pinned history article, fetch by slug instead of id
+      const query = supabase.from(contentType).select("*");
+      const { data, error } = isHistorySlug
+        ? await query.eq("slug", "lich-su").maybeSingle()
+        : await query.eq("id", id).single();
 
       if (error) {
         setPageError(error.message);
@@ -59,12 +66,22 @@ const AdminEditor = () => {
       }
 
       if (!data) {
+        // History slug record may not exist yet — let admin create it.
+        if (isHistorySlug) {
+          setTitle("Lịch sử hình thành và phát triển");
+          setContent("");
+          setHeaderImage("");
+          setRecordId(null);
+          setPageLoading(false);
+          return;
+        }
         setPageError("Không tìm thấy dữ liệu cần chỉnh sửa.");
         setPageLoading(false);
         return;
       }
 
       const d = data as any;
+      setRecordId(d.id ?? null);
       if (contentType === "leaders") {
         setName(d.name || "");
         setRole(d.role || "");
@@ -82,7 +99,7 @@ const AdminEditor = () => {
     };
 
     void loadRecord();
-  }, [id, contentType, isNew, isAdmin, isValidType]);
+  }, [id, contentType, isNew, isAdmin, isValidType, isHistorySlug]);
 
   useEffect(() => {
     if (!isValidType) {
