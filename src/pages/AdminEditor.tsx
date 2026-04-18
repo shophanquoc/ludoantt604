@@ -142,7 +142,15 @@ const AdminEditor = () => {
     }
 
     let error;
-    if (isNew) {
+    if (isHistorySlug) {
+      // Pinned History page — upsert by slug
+      const sb = supabase as any;
+      if (recordId) {
+        ({ error } = await sb.from("articles").update({ ...payload, slug: "lich-su" }).eq("id", recordId));
+      } else {
+        ({ error } = await sb.from("articles").insert({ ...payload, slug: "lich-su" }));
+      }
+    } else if (isNew) {
       ({ error } = await supabase.from(contentType).insert(payload as any));
     } else {
       ({ error } = await supabase.from(contentType).update(payload as any).eq("id", id!));
@@ -245,7 +253,13 @@ const AdminEditor = () => {
               </div>
               <div className="space-y-2">
                 <Label>Chức vụ *</Label>
-                <Input value={role} onChange={(e) => setRole(e.target.value)} />
+                <Select value={role} onValueChange={setRole}>
+                  <SelectTrigger><SelectValue placeholder="Chọn chức vụ" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Lữ đoàn trưởng">Lữ đoàn trưởng</SelectItem>
+                    <SelectItem value="Chính ủy">Chính ủy</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label>Nhiệm kỳ</Label>
