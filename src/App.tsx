@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Admin from "./pages/Admin";
 import AdminEditor from "./pages/AdminEditor";
 import History from "./pages/History";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
               <Route path="/activity/:id" element={<Index />} />
               <Route path="/login" element={<Login />} />
               <Route path="/admin/login" element={<Login />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/admin/:type/:id" element={<AdminEditor />} />
               <Route path="*" element={<NotFound />} />
