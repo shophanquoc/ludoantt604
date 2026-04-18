@@ -1,6 +1,13 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, Search, LogIn, Moon, Sun, ShieldCheck, History, Newspaper, CalendarDays, Users, Home, X } from "lucide-react";
+import { Menu, Search, LogIn, Moon, Sun, ShieldCheck, History, Newspaper, CalendarDays, Users, Home, Filter } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { NavLink } from "@/components/NavLink";
