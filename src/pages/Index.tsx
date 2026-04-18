@@ -5,6 +5,7 @@ import type { Tables } from "@/integrations/supabase/types";
 import SiteHeader from "@/components/layout/SiteHeader";
 import SiteFooter from "@/components/layout/SiteFooter";
 import ScrollToTop from "@/components/layout/ScrollToTop";
+import LeadersTimeline from "@/components/LeadersTimeline";
 import Hero from "@/components/layout/Hero";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -437,12 +438,12 @@ const Index = () => {
               <div className="space-y-2">
                 <Badge variant="outline">Lãnh đạo đơn vị</Badge>
                 <h1 className="font-display text-3xl font-bold tracking-tight">Lãnh đạo qua từng thời kỳ</h1>
-                <p className="text-muted-foreground">Hồ sơ lãnh đạo qua từng thời kỳ.</p>
+                <p className="text-muted-foreground">Bấm vào một mục để xem chi tiết. Mới nhất ở trên.</p>
               </div>
               {loading
                 ? renderLoading()
                 : leaders.length
-                  ? <div className="grid gap-4 md:grid-cols-2">{leaders.map(renderLeaderCard)}</div>
+                  ? <LeadersTimeline leaders={leaders} />
                   : renderEmpty("Chưa có dữ liệu lãnh đạo", "Bạn có thể thêm hồ sơ lãnh đạo từ trang quản trị.")}
             </section>
           ) : (
