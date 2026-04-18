@@ -111,7 +111,18 @@ const Admin = () => {
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl p-4">
+      <main className="mx-auto max-w-5xl p-4 space-y-4">
+        {/* Quick action: edit pinned History page */}
+        <div className="flex flex-col items-start justify-between gap-3 rounded-lg border bg-background p-4 sm:flex-row sm:items-center">
+          <div>
+            <p className="text-sm font-semibold">Trang Lịch sử lữ đoàn</p>
+            <p className="text-xs text-muted-foreground">Bài viết cố định hiển thị tại /lich-su (slug: lich-su).</p>
+          </div>
+          <Button size="sm" variant="outline" onClick={() => navigate("/admin/articles/lich-su")}>
+            <Pencil className="mr-1.5 h-4 w-4" /> Chỉnh sửa trang Lịch sử
+          </Button>
+        </div>
+
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabType)}>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <TabsList className="w-full sm:w-auto">
