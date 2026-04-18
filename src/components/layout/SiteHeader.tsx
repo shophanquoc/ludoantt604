@@ -1,6 +1,13 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, Search, LogIn, Moon, Sun, ShieldCheck, History, Newspaper, CalendarDays, Users, Home, X } from "lucide-react";
+import { Menu, Search, LogIn, Moon, Sun, ShieldCheck, History, Newspaper, CalendarDays, Users, Home, Filter } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { NavLink } from "@/components/NavLink";
@@ -22,12 +29,17 @@ const SiteHeader = () => {
   const { theme, toggleTheme } = useTheme();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [timeFilter, setTimeFilter] = useState("all");
 
   const submitSearch = (e: FormEvent) => {
     e.preventDefault();
     const q = query.trim();
     setOpen(false);
-    if (q) navigate(`/tin-tuc?q=${encodeURIComponent(q)}`);
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    if (timeFilter && timeFilter !== "all") params.set("time", timeFilter);
+    const qs = params.toString();
+    navigate(`/tin-tuc${qs ? `?${qs}` : ""}`);
   };
 
   const goAdmin = () => {
@@ -103,23 +115,18 @@ const SiteHeader = () => {
           </SheetTrigger>
           <SheetContent side="left" className="w-[300px] p-0">
             <div className="flex h-full flex-col">
-              <div className="flex items-center justify-between p-5">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                    <ShieldCheck className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="font-display text-base font-semibold leading-tight">Lữ đoàn 604</p>
-                    <p className="text-xs text-muted-foreground">QK2 - Thông tin</p>
-                  </div>
+              <div className="flex items-center gap-2 p-5 pr-12">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                  <ShieldCheck className="h-5 w-5" />
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="Đóng">
-                  <X className="h-4 w-4" />
-                </Button>
+                <div>
+                  <p className="font-display text-base font-semibold leading-tight">Lữ đoàn 604</p>
+                  <p className="text-xs text-muted-foreground">QK2 - Thông tin</p>
+                </div>
               </div>
               <Separator />
 
-              <form onSubmit={submitSearch} className="p-4">
+              <form onSubmit={submitSearch} className="space-y-2 p-4">
                 <div className="relative">
                   <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
@@ -128,6 +135,22 @@ const SiteHeader = () => {
                     placeholder="Tìm bài viết..."
                     className="h-10 pl-8"
                   />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Filter className="h-4 w-4 text-muted-foreground" />
+                  <Select value={timeFilter} onValueChange={setTimeFilter}>
+                    <SelectTrigger className="h-9 flex-1">
+                      <SelectValue placeholder="Thời gian" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Tất cả thời gian</SelectItem>
+                      <SelectItem value="7d">7 ngày qua</SelectItem>
+                      <SelectItem value="30d">30 ngày qua</SelectItem>
+                      <SelectItem value="90d">3 tháng qua</SelectItem>
+                      <SelectItem value="365d">1 năm qua</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button type="submit" size="sm">Tìm</Button>
                 </div>
               </form>
 

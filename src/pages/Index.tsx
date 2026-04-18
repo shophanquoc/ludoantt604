@@ -539,14 +539,21 @@ const Index = () => {
               </section>
 
               <section className="space-y-4">
-                <div>
-                  <h2 className="font-display text-2xl font-bold">Lãnh đạo</h2>
-                  <p className="text-sm text-muted-foreground">Lãnh đạo đơn vị qua từng thời kỳ.</p>
+                <div className="flex items-end justify-between gap-4">
+                  <div>
+                    <h2 className="font-display text-2xl font-bold">Lãnh đạo</h2>
+                    <p className="text-sm text-muted-foreground">Hai lãnh đạo mới nhất của đơn vị.</p>
+                  </div>
+                  <Button asChild variant="ghost" size="sm">
+                    <Link to="/leaders">
+                      Xem thêm <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
                 </div>
                 {loading
                   ? renderLoading()
                   : leaders.length
-                    ? <div className="grid gap-4 md:grid-cols-2">{leaders.slice(0, 4).map(renderLeaderCard)}</div>
+                    ? <div className="grid gap-4 md:grid-cols-2">{leaders.slice(0, 2).map(renderLeaderCard)}</div>
                     : renderEmpty("Chưa có dữ liệu", "Hồ sơ lãnh đạo sẽ hiển thị tại đây.")}
               </section>
             </div>

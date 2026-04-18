@@ -1,19 +1,30 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Home, LogIn, ShieldCheck } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Home, KeyRound, LogIn, ShieldCheck } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotSending, setForgotSending] = useState(false);
   const { signIn, isAdmin, user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -36,6 +47,28 @@ const Login = () => {
     } else {
       navigate("/admin", { replace: true });
     }
+  };
+
+  const handleForgot = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const target = forgotEmail.trim();
+    if (!target) return;
+    setForgotSending(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(target, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setForgotSending(false);
+
+    if (error) {
+      toast({ title: "Không gửi được email", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({
+      title: "Đã gửi email",
+      description: "Kiểm tra hộp thư để đặt lại mật khẩu.",
+    });
+    setForgotOpen(false);
+    setForgotEmail("");
   };
 
   return (
@@ -65,7 +98,19 @@ const Login = () => {
               <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Mật khẩu</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Mật khẩu</Label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setForgotEmail(email);
+                    setForgotOpen(true);
+                  }}
+                  className="text-xs text-primary hover:underline"
+                >
+                  Quên mật khẩu?
+                </button>
+              </div>
               <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
             <Button type="submit" className="w-full" disabled={submitting || loading}>
@@ -82,6 +127,39 @@ const Login = () => {
           </form>
         </CardContent>
       </Card>
+
+      <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <KeyRound className="h-5 w-5" /> Quên mật khẩu
+            </DialogTitle>
+            <DialogDescription>
+              Nhập email tài khoản admin. Chúng tôi sẽ gửi liên kết đặt lại mật khẩu.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleForgot} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="forgot-email">Email</Label>
+              <Input
+                id="forgot-email"
+                type="email"
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                required
+              />
+            </div>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button type="button" variant="ghost" onClick={() => setForgotOpen(false)}>
+                Huỷ
+              </Button>
+              <Button type="submit" disabled={forgotSending}>
+                {forgotSending ? "Đang gửi..." : "Gửi liên kết"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
