@@ -103,7 +103,8 @@ const History = () => {
             !error && (
               <Card className="mt-6 border-dashed">
                 <CardContent className="p-8 text-center text-muted-foreground">
-Lữ đoàn Thông tin 604 tiền thân là Trung đoàn Thông tin 604, được thành lập ngày 9-9-1978, tại xã An Tường, huyện Yên Sơn, tỉnh Hà Tuyên (nay thuộc Phường An Tường, thành phố Tuyên Quang, tỉnh Tuyên Quang), là đơn vị binh chủng, bảo đảm thông tin liên lạc phục vụ Đảng ủy, Bộ tư lệnh Quân khu lãnh đạo, chỉ huy, chỉ đạo các cơ quan, đơn vị trong LLVT Quân khu 2 thực hiện nhiệm vụ quân sự, quốc phòng và liên lạc với cấp trên.                </CardContent>
+                  Chưa có nội dung cho trang Lịch sử. Quản trị viên có thể tạo nội dung từ trang Quản trị → "Chỉnh sửa trang Lịch sử".
+                </CardContent>
               </Card>
             )
           )}
