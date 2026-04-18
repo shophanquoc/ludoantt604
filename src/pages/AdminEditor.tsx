@@ -54,10 +54,9 @@ const AdminEditor = () => {
       setPageError(null);
 
       // For the pinned history article, fetch by slug instead of id
-      const query = supabase.from(contentType).select("*");
       const { data, error } = isHistorySlug
-        ? await query.eq("slug", "lich-su").maybeSingle()
-        : await query.eq("id", id).single();
+        ? await (supabase as any).from(contentType).select("*").eq("slug", "lich-su").maybeSingle()
+        : await (supabase as any).from(contentType).select("*").eq("id", id).single();
 
       if (error) {
         setPageError(error.message);
