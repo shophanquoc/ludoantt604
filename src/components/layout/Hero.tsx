@@ -14,9 +14,17 @@ const Hero = () => {
         aria-hidden
         className="absolute inset-0 -z-10 opacity-60"
         style={{
-          backgroundImage:
-            "radial-gradient(60rem 30rem at 80% -10%, hsl(var(--hero-glow) / 0.35), transparent 60%), radial-gradient(40rem 20rem at 0% 110%, hsl(var(--hero-accent) / 0.25), transparent 60%)",
-        }}
+    background: `
+      radial-gradient(800px 400px at 80% -10%, rgba(102, 201, 255, 0.83), transparent 60%),
+      radial-gradient(600px 300px at 0% 100%, rgba(147, 58, 231, 0.56), transparent 60%),
+      #FFF5EE
+    `,
+  }}
+        // style={{
+        //   backgroundImage:
+        //            // "radial-gradient(60rem 30rem at 80% -10%, hsl(var(--hero-glow) / 0.35), transparent 60%), radial-gradient(40rem 20rem at 0% 110%, hsl(var(--hero-accent) / 0.25), transparent 60%)", 
+        //     "radial-gradient(60rem 30rem at 80% -10%, hsl(var(--hero-glow) / 0.15), transparent 60%), radial-gradient(40rem 20rem at 0% 110%, hsl(var(--hero-accent) / 0.1), transparent 60%)",
+        // }}
       />
       <div
         aria-hidden
@@ -28,14 +36,21 @@ const Hero = () => {
         }}
       />
 
-      <div className="mx-auto max-w-6xl px-4 py-20 md:py-28 lg:py-32">
+      <div className="mx-auto max-w-6xl px-4 py-20 md:py-28 lg:py-32" >
+
         <div className="max-w-3xl text-[hsl(var(--hero-foreground))]">
-          <span className="inline-flex items-center gap-2 rounded-full border border-[hsl(var(--hero-foreground)/0.25)] bg-[hsl(var(--hero-foreground)/0.06)] px-3 py-1 text-xs font-medium uppercase tracking-wider text-[hsl(var(--hero-foreground)/0.85)]">
+          <span   style={{ color: "#FFD700" }}
+          className="
+         
+          inline-flex items-center gap-2 rounded-full border border-[hsl(var(--hero-foreground)/0.25)] bg-[hsl(var(--hero-foreground)/0.06)] px-3 py-1 text-xs font-medium uppercase tracking-wider text-[hsl(var(--hero-foreground)/0.85)]">
             <Sparkles className="h-3.5 w-3.5" />
             Kỷ niệm truyền thống
           </span>
 
-          <h1 className="mt-6 font-display text-4xl font-bold leading-[1.1] tracking-tight md:text-6xl lg:text-7xl">
+          <h1 className="mt-6 font-display text-4xl font-bold leading-[1.1] tracking-tight md:text-6xl lg:text-7xl"
+          // color #D32F3F
+            style={{ color: "#D32F3F" }}
+          >
             Lịch sử Lữ đoàn Thông tin 604
           </h1>
 

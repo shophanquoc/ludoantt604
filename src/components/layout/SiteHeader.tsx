@@ -54,9 +54,9 @@ const SiteHeader = () => {
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <ShieldCheck className="h-5 w-5" />
           </div>
-          <div className="hidden sm:block">
+          <div className="">
             <p className="font-display text-base font-semibold leading-tight">Lữ đoàn 604</p>
-            <p className="text-xs text-muted-foreground">Lịch sử & truyền thống</p>
+            <p className="hidden sm:block text-xs text-muted-foreground">Lịch sử & truyền thống</p>
           </div>
         </Link>
 
@@ -116,8 +116,9 @@ const SiteHeader = () => {
           <SheetContent side="left" className="w-[300px] p-0">
             <div className="flex h-full flex-col">
               <div className="flex items-center gap-2 p-5 pr-12">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <ShieldCheck className="h-5 w-5" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground"> 
+                
+                  <ShieldCheck className="h-5 w-5"   />
                 </div>
                 <div>
                   <p className="font-display text-base font-semibold leading-tight">Lữ đoàn 604</p>

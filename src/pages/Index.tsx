@@ -293,7 +293,7 @@ const Index = () => {
         </div>
         <Button type="submit" size="sm">Tìm</Button>
       </form>
-      <div className="flex flex-wrap gap-2">
+      {/* <div className="flex flex-wrap gap-2">
         {showCategory && categories.length > 0 && (
           <Select value={categoryParam} onValueChange={(v) => updateParam("cat", v)}>
             <SelectTrigger className="h-9 w-[160px]"><SelectValue placeholder="Chuyên mục" /></SelectTrigger>
@@ -309,7 +309,7 @@ const Index = () => {
             {TIME_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
           </SelectContent>
         </Select>
-      </div>
+      </div> */}
     </div>
   );
 
