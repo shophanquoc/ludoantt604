@@ -15,11 +15,14 @@ const Hero = () => {
         className="absolute inset-0 -z-10 opacity-60"
         style={{
     background: `
-      radial-gradient(800px 400px at 80% -10%, rgb(244, 193, 193), transparent 60%),
-      radial-gradient(600px 300px at 0% 100%, rgb(244, 182, 182), transparent 60%),
-      #FFD700
+      radial-gradient(800px 400px at 80% -10%, rgba(243, 191, 142, 0.86), transparent 60%),
+      radial-gradient(600px 300px at 0% 100%, rgba(243, 119, 216, 0.8), transparent 60%),
+      #ab0010
     `,
   }}
+  // style={{
+  //   backgroundColor :'#ab0010',
+  // }}
         // style={{
         //   backgroundImage:
         //            // "radial-gradient(60rem 30rem at 80% -10%, hsl(var(--hero-glow) / 0.35), transparent 60%), radial-gradient(40rem 20rem at 0% 110%, hsl(var(--hero-accent) / 0.25), transparent 60%)", 
@@ -54,7 +57,7 @@ const Hero = () => {
 
           <h1 className="mt-6 font-display text-4xl font-bold leading-[1.1] tracking-tight md:text-6xl lg:text-7xl"
           // color #D32F3F
-            style={{ color: "#D32F3F" }}
+            style={{ color: "#f9e972" }}
           >
             Lịch sử Lữ đoàn Thông tin 604
           </h1>
