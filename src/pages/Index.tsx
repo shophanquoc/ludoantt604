@@ -401,7 +401,30 @@ const Index = () => {
             <SelectTrigger className="h-9 w-[160px]"><SelectValue placeholder="Chuyên mục" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tất cả chuyên mục</SelectItem>
-              {categories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+              {/* {categories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+               */}
+               {/* {item.category === "tin-tuc" ?
+              "Tin tức"
+            : item.category === "thong-bao" ?
+              "Thông báo"
+            : item.category === "su-kien" ?
+              "Sự kiện"
+            : item.category ||
+              (item.kind === "activity" ? "Hoạt động" : "Tin tức")
+            } */}
+
+              {categories.map((c) => {  
+                const label = c === "tin-tuc" ?
+                  "Tin tức"
+                : c === "thong-bao" ?
+                  "Thông báo"
+                : c === "su-kien" ? 
+                  "Sự kiện"
+                : c;
+                return <SelectItem key={c} value={c}>{label}</SelectItem>;
+              }
+              )}
+              
             </SelectContent>
           </Select>
         )}
