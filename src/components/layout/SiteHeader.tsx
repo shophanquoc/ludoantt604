@@ -71,7 +71,7 @@ const SiteHeader = () => {
           </div>
           <div className="">
             <p className="font-display text-base font-semibold leading-tight">
-              Lữ đoàn 604
+              Trang thông tin Lữ đoàn 604
             </p>
             <p className="hidden sm:block text-xs text-muted-foreground">
               Lịch sử & truyền thống
@@ -99,13 +99,14 @@ const SiteHeader = () => {
           <div className="relative">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
+              autoFocus={false} 
+              ref={(el) => { if (el && !/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) el.focus(); }}//meanwhile mobile devices will focus the search input when the search button is clicked, so we disable autoFocus and manually focus only on non-mobile devices to avoid unwanted keyboard pop-up on mobile
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Tìm bài viết..."
               className="h-9 w-44 pl-8 lg:w-56"
               aria-label="Tìm kiếm"
-              // no auto focus on mobile to avoid keyboard pop-up
-              autoFocus={false}
+
             />
           </div>
         </form>

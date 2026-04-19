@@ -78,12 +78,24 @@ const getInitials = (value: string) =>
     .map((part) => part[0]?.toUpperCase())
     .join("");
 
+// const TIME_OPTIONS = [
+//   { value: "all", label: "Tất cả thời gian" },
+//   { value: "7d", label: "7 ngày qua" },
+//   { value: "30d", label: "30 ngày qua" },
+//   { value: "90d", label: "3 tháng qua" },
+//   { value: "365d", label: "1 năm qua" },
+// ];
+// choose time options by calendar units instead of fixed days (to be more intuitive, e.g. "tháng này", "năm ngoái")
 const TIME_OPTIONS = [
   { value: "all", label: "Tất cả thời gian" },
   { value: "7d", label: "7 ngày qua" },
   { value: "30d", label: "30 ngày qua" },
   { value: "90d", label: "3 tháng qua" },
   { value: "365d", label: "1 năm qua" },
+  { value: "this_month", label: "Tháng này" },
+  { value: "last_month", label: "Tháng trước" },
+  { value: "this_year", label: "Năm nay" },
+  { value: "last_year", label: "Năm trước" },
 ];
 
 const withinTimeFilter = (createdAt: string, range: string) => {
@@ -424,7 +436,7 @@ const Index = () => {
                 return <SelectItem key={c} value={c}>{label}</SelectItem>;
               }
               )}
-              
+
             </SelectContent>
           </Select>
         )}
