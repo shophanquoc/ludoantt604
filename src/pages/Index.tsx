@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import SiteHeader from "@/components/layout/SiteHeader";
@@ -8,7 +14,13 @@ import ScrollToTop from "@/components/layout/ScrollToTop";
 import LeadersTimeline from "@/components/LeadersTimeline";
 import Hero from "@/components/layout/Hero";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -21,7 +33,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, ArrowRight, CalendarDays, Newspaper, RefreshCw, Search } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CalendarDays,
+  Newspaper,
+  RefreshCw,
+  Search,
+} from "lucide-react";
 
 type Article = Tables<"articles">;
 type Activity = Tables<"activities">;
@@ -38,10 +57,18 @@ type ContentItem = {
   href: string;
 };
 
-const stripHtml = (value: string) => value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+const stripHtml = (value: string) =>
+  value
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 
 const formatDate = (value: string) =>
-  new Intl.DateTimeFormat("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(value));
+  new Intl.DateTimeFormat("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(new Date(value));
 
 const getInitials = (value: string) =>
   value
@@ -90,17 +117,32 @@ const Index = () => {
     setLoading(true);
     setError(null);
 
-    const [articlesResult, activitiesResult, leadersResult] = await Promise.all([
-      supabase.from("articles").select("*").order("created_at", { ascending: false }),
-      supabase.from("activities").select("*").order("created_at", { ascending: false }),
-      supabase.from("leaders").select("*").order("created_at", { ascending: false }),
-    ]);
+    const [articlesResult, activitiesResult, leadersResult] = await Promise.all(
+      [
+        supabase
+          .from("articles")
+          .select("*")
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("activities")
+          .select("*")
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("leaders")
+          .select("*")
+          .order("created_at", { ascending: false }),
+      ],
+    );
 
     setArticles(articlesResult.data || []);
     setActivities(activitiesResult.data || []);
     setLeaders(leadersResult.data || []);
 
-    const errors = [articlesResult.error, activitiesResult.error, leadersResult.error]
+    const errors = [
+      articlesResult.error,
+      activitiesResult.error,
+      leadersResult.error,
+    ]
       .filter(Boolean)
       .map((item) => item?.message)
       .join(" · ");
@@ -159,18 +201,26 @@ const Index = () => {
   const filterItems = (items: ContentItem[]) => {
     const q = queryParam.trim().toLowerCase();
     return items.filter((item) => {
-      if (categoryParam !== "all" && item.category !== categoryParam) return false;
+      if (categoryParam !== "all" && item.category !== categoryParam)
+        return false;
       if (!withinTimeFilter(item.created_at, timeParam)) return false;
       if (q) {
-        const haystack = `${item.title} ${stripHtml(item.content)}`.toLowerCase();
+        const haystack =
+          `${item.title} ${stripHtml(item.content)}`.toLowerCase();
         if (!haystack.includes(q)) return false;
       }
       return true;
     });
   };
 
-  const filteredArticles = useMemo(() => filterItems(articleItems), [articleItems, queryParam, categoryParam, timeParam]);
-  const filteredActivities = useMemo(() => filterItems(activityItems), [activityItems, queryParam, categoryParam, timeParam]);
+  const filteredArticles = useMemo(
+    () => filterItems(articleItems),
+    [articleItems, queryParam, categoryParam, timeParam],
+  );
+  const filteredActivities = useMemo(
+    () => filterItems(activityItems),
+    [activityItems, queryParam, categoryParam, timeParam],
+  );
 
   const currentArticle = useMemo(
     () => articles.find((article) => article.id === id) || null,
@@ -186,7 +236,12 @@ const Index = () => {
   const isActivitiesPage = location.pathname === "/activities";
   const isLeadersPage = location.pathname === "/leaders";
   const isNewsPage = location.pathname === "/tin-tuc";
-  const isHome = !isArticlePage && !isActivityDetail && !isActivitiesPage && !isLeadersPage && !isNewsPage;
+  const isHome =
+    !isArticlePage &&
+    !isActivityDetail &&
+    !isActivitiesPage &&
+    !isLeadersPage &&
+    !isNewsPage;
 
   const updateParam = (key: string, value: string) => {
     const next = new URLSearchParams(searchParams);
@@ -201,37 +256,53 @@ const Index = () => {
   };
 
   const renderItemCard = (item: ContentItem) => (
-    <Card key={`${item.kind}-${item.id}`} className="overflow-hidden border-border/80 transition-shadow hover:shadow-md">
+    <Card
+      key={`${item.kind}-${item.id}`}
+      className="overflow-hidden border-border/80 transition-shadow hover:shadow-md
+      px-0
+      gap-0
+      "
+    >
       {item.image && (
         <Link to={item.href} className="block">
-          <img src={item.image} alt={item.title} className="h-48 w-full object-cover" loading="lazy" />
+          <img
+            src={item.image}
+            alt={item.title}
+            className="h-32 w-full object-cover"
+            loading="lazy"
+          />
         </Link>
       )}
-      <CardHeader>
-        <div className="flex items-center gap-1 text-xs  text-muted-foreground">
+      <CardHeader className="space-y-1 p-2">
+        <div className="flex items-center  gap-1 text-xs  text-muted-foreground">
           {/* gap-1 mean */}
           {/* <Badge variant="outline">{item.category || (item.kind === "activity" ? "Hoạt động" : "Tin tức")}</Badge> */}
           {/* display 'tin-tuc' by 'Tin tức', 'thong-bao' by 'Thông báo', 'su-kien' by 'Sự kiện' */}
           <Badge variant="outline">
-            {item.category === "tin-tuc"  
-              ? "Tin tức"
-              : item.category === "thong-bao"
-                ? "Thông báo"
-                : item.category === "su-kien"
-                  ? "Sự kiện"
-                  : item.category || (item.kind === "activity" ? "Hoạt động" : "Tin tức")}
+            {item.category === "tin-tuc" ?
+              "Tin tức"
+            : item.category === "thong-bao" ?
+              "Thông báo"
+            : item.category === "su-kien" ?
+              "Sự kiện"
+            : item.category ||
+              (item.kind === "activity" ? "Hoạt động" : "Tin tức")
+            }
           </Badge>
 
           <span>{formatDate(item.created_at)}</span>
         </div>
         {/* <CardTitle className="font-display text-xl leading-snug"> */}
-          {/* text - xl pc, text-lg mobile */}
-        <CardTitle className="font-display text-lg leading-snug">
+        {/* text - xl pc, text-lg mobile */}
+        <CardTitle className="font-display text-lg leading-snug p-2">
           <Link to={item.href} className="hover:text-primary">
             {item.title}
           </Link>
         </CardTitle>
-        <CardDescription>{stripHtml(item.content).slice(0, 10) || "Chưa có nội dung tóm tắt."} ...</CardDescription>
+        <CardDescription>
+          {/* {stripHtml(item.content).slice(0, 100) || "Chưa có nội dung tóm tắt."}{" "} */}
+          
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Button asChild variant="outline">
@@ -247,20 +318,28 @@ const Index = () => {
     <Card key={leader.id} className="border-border/80">
       <CardHeader className="flex flex-row items-start gap-4 space-y-0">
         <Avatar className="h-14 w-14 border">
-          <AvatarImage src={leader.avatar || undefined} alt={leader.name} className="object-cover" />
+          <AvatarImage
+            src={leader.avatar || undefined}
+            alt={leader.name}
+            className="object-cover"
+          />
           <AvatarFallback>{getInitials(leader.name)}</AvatarFallback>
         </Avatar>
         <div className="space-y-2">
           <CardTitle className="font-display text-lg">{leader.name}</CardTitle>
           <CardDescription>
-            <span className="block font-medium text-foreground">{leader.role}</span>
+            <span className="block font-medium text-foreground">
+              {leader.role}
+            </span>
             <span>{leader.years || "Chưa cập nhật nhiệm kỳ"}</span>
           </CardDescription>
         </div>
       </CardHeader>
       {leader.info && (
         <CardContent>
-          <p className="text-sm text-muted-foreground">{stripHtml(leader.info).slice(0, 100)}...</p>
+          <p className="text-sm text-muted-foreground">
+            {stripHtml(leader.info).slice(0, 100)}...
+          </p>
         </CardContent>
       )}
     </Card>
@@ -295,7 +374,10 @@ const Index = () => {
 
   const renderFilters = (categories: string[], showCategory = true) => (
     <div className="flex flex-col gap-3 rounded-xl border border-border/60 bg-muted/30 p-4 md:flex-row md:items-center">
-      <form onSubmit={handleSearchSubmit} className="flex flex-1 items-center gap-2">
+      <form
+        onSubmit={handleSearchSubmit}
+        className="flex flex-1 items-center gap-2"
+      >
         <div className="relative flex-1">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -305,9 +387,11 @@ const Index = () => {
             className="h-9 pl-8"
           />
         </div>
-        <Button type="submit" size="sm">Tìm</Button>
+        <Button type="submit" size="sm">
+          Tìm
+        </Button>
       </form>
-      {/* <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2">
         {showCategory && categories.length > 0 && (
           <Select value={categoryParam} onValueChange={(v) => updateParam("cat", v)}>
             <SelectTrigger className="h-9 w-[160px]"><SelectValue placeholder="Chuyên mục" /></SelectTrigger>
@@ -323,14 +407,19 @@ const Index = () => {
             {TIME_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
           </SelectContent>
         </Select>
-      </div> */}
+      </div>
     </div>
   );
 
   // Related articles (exclude current id, share category if available)
-  const getRelated = (currentId: string, category: string | null, pool: ContentItem[]) => {
+  const getRelated = (
+    currentId: string,
+    category: string | null,
+    pool: ContentItem[],
+  ) => {
     const others = pool.filter((p) => p.id !== currentId);
-    const sameCat = category ? others.filter((p) => p.category === category) : [];
+    const sameCat =
+      category ? others.filter((p) => p.category === category) : [];
     const merged = [...sameCat, ...others.filter((p) => !sameCat.includes(p))];
     return merged.slice(0, 3);
   };
@@ -355,20 +444,27 @@ const Index = () => {
             </Alert>
           )}
 
-          {isArticlePage || isActivityDetail ? (
+          {isArticlePage || isActivityDetail ?
             (() => {
               const detail = isArticlePage ? currentArticle : currentActivity;
-              const category = isArticlePage ? currentArticle?.category ?? null : "Hoạt động";
+              const category =
+                isArticlePage ?
+                  (currentArticle?.category ?? null)
+                : "Hoạt động";
               const relatedPool = isArticlePage ? articleItems : activityItems;
               const related = id ? getRelated(id, category, relatedPool) : [];
               return (
                 <section className="space-y-6">
-                  <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate(-1)}
+                  >
                     <ArrowLeft className="mr-1.5 h-4 w-4" /> Quay lại
                   </Button>
-                  {loading ? (
+                  {loading ?
                     renderLoading()
-                  ) : detail ? (
+                  : detail ?
                     <>
                       <article className="space-y-6">
                         {detail.image && (
@@ -379,7 +475,9 @@ const Index = () => {
                           />
                         )}
                         <div className="space-y-3">
-                          <Badge variant="outline">{category || "Bài viết"}</Badge>
+                          <Badge variant="outline">
+                            {category || "Bài viết"}
+                          </Badge>
                           <h1 className="font-display text-3xl font-bold tracking-tight md:text-4xl">
                             {detail.title}
                           </h1>
@@ -392,7 +490,8 @@ const Index = () => {
                             <div
                               className="prose-content space-y-4 text-sm leading-7 [&_h2]:text-2xl [&_h2]:font-semibold [&_img]:my-4 [&_img]:rounded-xl [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
                               dangerouslySetInnerHTML={{
-                                __html: detail.content || "<p>Chưa có nội dung.</p>",
+                                __html:
+                                  detail.content || "<p>Chưa có nội dung.</p>",
                               }}
                             />
                           </CardContent>
@@ -402,7 +501,9 @@ const Index = () => {
                       {related.length > 0 && (
                         <section className="space-y-4 pt-6">
                           <h2 className="font-display text-2xl font-bold">
-                            {isArticlePage ? "Bài viết liên quan" : "Hoạt động khác"}
+                            {isArticlePage ?
+                              "Bài viết liên quan"
+                            : "Hoạt động khác"}
                           </h2>
                           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                             {related.map(renderItemCard)}
@@ -410,70 +511,105 @@ const Index = () => {
                         </section>
                       )}
                     </>
-                  ) : (
-                    renderEmpty(
-                      isArticlePage ? "Không tìm thấy bài viết" : "Không tìm thấy hoạt động",
+                  : renderEmpty(
+                      isArticlePage ?
+                        "Không tìm thấy bài viết"
+                      : "Không tìm thấy hoạt động",
                       "Nội dung này có thể đã bị xoá hoặc chưa được tải về.",
                     )
-                  )}
+                  }
                 </section>
               );
             })()
-          ) : isNewsPage ? (
+          : isNewsPage ?
             <section className="space-y-6">
               <div className="space-y-2">
                 <Badge variant="outline">Tin tức</Badge>
-                <h1 className="font-display text-3xl font-bold tracking-tight">Bản tin đơn vị</h1>
-                <p className="text-muted-foreground">Tổng hợp tin tức mới nhất từ Lữ đoàn.</p>
+                <h1 className="font-display text-3xl font-bold tracking-tight">
+                  Bản tin đơn vị
+                </h1>
+                <p className="text-muted-foreground">
+                  Tổng hợp tin tức mới nhất từ Lữ đoàn.
+                </p>
               </div>
               {renderFilters(articleCategories)}
-              {loading
-                ? renderLoading()
-                : filteredArticles.length
-                  ? <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{filteredArticles.map(renderItemCard)}</div>
-                  : renderEmpty("Không có kết quả", "Hãy thử thay đổi từ khoá hoặc bộ lọc.")}
+              {loading ?
+                renderLoading()
+              : filteredArticles.length ?
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  {filteredArticles.map(renderItemCard)}
+                </div>
+              : renderEmpty(
+                  "Không có kết quả",
+                  "Hãy thử thay đổi từ khoá hoặc bộ lọc.",
+                )
+              }
             </section>
-          ) : isActivitiesPage ? (
+          : isActivitiesPage ?
             <section className="space-y-6">
               <div className="space-y-2">
                 <Badge variant="outline">Hoạt động</Badge>
-                <h1 className="font-display text-3xl font-bold tracking-tight">Danh sách hoạt động</h1>
-                <p className="text-muted-foreground">Tổng hợp các hoạt động mới nhất.</p>
+                <h1 className="font-display text-3xl font-bold tracking-tight">
+                  Danh sách hoạt động
+                </h1>
+                <p className="text-muted-foreground">
+                  Tổng hợp các hoạt động mới nhất.
+                </p>
               </div>
               {renderFilters([], false)}
-              {loading
-                ? renderLoading()
-                : filteredActivities.length
-                  ? <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 
+              {loading ?
+                renderLoading()
+              : filteredActivities.length ?
+                <div
+                  className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 
 
                     text-sm
-                  ">{filteredActivities.map(renderItemCard)}</div>
-                  : renderEmpty("Không có kết quả", "Hãy thử thay đổi từ khoá hoặc bộ lọc.")}
+                  "
+                >
+                  {filteredActivities.map(renderItemCard)}
+                </div>
+              : renderEmpty(
+                  "Không có kết quả",
+                  "Hãy thử thay đổi từ khoá hoặc bộ lọc.",
+                )
+              }
             </section>
-          ) : isLeadersPage ? (
+          : isLeadersPage ?
             <section className="space-y-6">
               <div className="space-y-2">
                 <Badge variant="outline">Lãnh đạo đơn vị</Badge>
-                <h1 className="font-display text-3xl font-bold tracking-tight">Lãnh đạo qua từng thời kỳ</h1>
-                <p className="text-muted-foreground">Bấm vào một mục để xem chi tiết. Mới nhất ở trên.</p>
+                <h1 className="font-display text-3xl font-bold tracking-tight">
+                  Lãnh đạo qua từng thời kỳ
+                </h1>
+                <p className="text-muted-foreground">
+                  Bấm vào một mục để xem chi tiết. Mới nhất ở trên.
+                </p>
               </div>
-              {loading
-                ? renderLoading()
-                : leaders.length
-                  ? <LeadersTimeline leaders={leaders} />
-                  : renderEmpty("Chưa có dữ liệu lãnh đạo", "Bạn có thể thêm hồ sơ lãnh đạo từ trang quản trị.")}
+              {loading ?
+                renderLoading()
+              : leaders.length ?
+                <LeadersTimeline leaders={leaders} />
+              : renderEmpty(
+                  "Chưa có dữ liệu lãnh đạo",
+                  "Bạn có thể thêm hồ sơ lãnh đạo từ trang quản trị.",
+                )
+              }
             </section>
-          ) : (
-            <div className="space-y-12">
+          : <div className="space-y-12">
               {/* Homepage filter */}
-              {(articleItems.length > 0 || activityItems.length > 0) && renderFilters(articleCategories)}
+              {(articleItems.length > 0 || activityItems.length > 0) &&
+                renderFilters(articleCategories)}
 
               {/* Featured news */}
               <section className="space-y-4">
                 <div className="flex items-end justify-between gap-4">
                   <div>
-                    <h2 className="font-display text-3xl font-bold tracking-tight">Tin tức nổi bật</h2>
-                    <p className="text-sm text-muted-foreground">Các bài viết mới được cập nhật từ hệ thống.</p>
+                    <h2 className="font-display text-3xl font-bold tracking-tight">
+                      Tin tức nổi bật
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      Các bài viết mới được cập nhật từ hệ thống.
+                    </p>
                   </div>
                   <Button asChild variant="ghost" size="sm">
                     <Link to="/tin-tuc">
@@ -482,14 +618,14 @@ const Index = () => {
                   </Button>
                 </div>
 
-                {loading ? (
+                {loading ?
                   renderLoading()
-                ) : filteredArticles.length ? (
+                : filteredArticles.length ?
                   <>
                     {filteredArticles[0] && (
                       <Card className="overflow-hidden border-border/80">
                         <div className="grid md:grid-cols-2">
-                          {filteredArticles[0].image ? (
+                          {filteredArticles[0].image ?
                             <Link to={filteredArticles[0].href}>
                               <img
                                 src={filteredArticles[0].image}
@@ -497,40 +633,49 @@ const Index = () => {
                                 className="h-full max-h-80 w-full object-cover"
                               />
                             </Link>
-                          ) : (
-                            <div className="flex min-h-[16rem] items-center justify-center bg-muted">
+                          : <div className="flex min-h-[16rem] items-center justify-center bg-muted">
                               <Newspaper className="h-10 w-10 text-muted-foreground" />
                             </div>
-                          )}
+                          }
                           <div className="flex flex-col justify-center p-6 md:p-8">
                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                               {/* <Badge variant="outline">{filteredArticles[0].category || "Tin tức"}</Badge> */}
 
                               {/* display 'tin-tuc' by 'Tin tức', 'thong-bao' by 'Thông báo', 'su-kien' by 'Sự kiện' */}
                               <Badge variant="outline">
-                                {filteredArticles[0].category === "tin-tuc"  
-                                  ? "Tin tức" 
-                                  : filteredArticles[0].category === "thong-bao"
-                                    ? "Thông báo"
-                                    : filteredArticles[0].category === "su-kien"
-                                      ? "Sự kiện"
-                                      : filteredArticles[0].category || "Tin tức"}
+                                {filteredArticles[0].category === "tin-tuc" ?
+                                  "Tin tức"
+                                : filteredArticles[0].category === "thong-bao" ?
+                                  "Thông báo"
+                                : filteredArticles[0].category === "su-kien" ?
+                                  "Sự kiện"
+                                : filteredArticles[0].category || "Tin tức"}
                               </Badge>
-                                  
-                              <span>{formatDate(filteredArticles[0].created_at)}</span>
+
+                              <span>
+                                {formatDate(filteredArticles[0].created_at)}
+                              </span>
                             </div>
                             <h3 className="mt-3 font-display text-2xl font-semibold leading-snug md:text-3xl">
-                              <Link to={filteredArticles[0].href} className="hover:text-primary">
+                              <Link
+                                to={filteredArticles[0].href}
+                                className="hover:text-primary"
+                              >
                                 {filteredArticles[0].title}
                               </Link>
                             </h3>
                             <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">
-                              {stripHtml(filteredArticles[0].content).slice(0, 100) || "Chưa có nội dung tóm tắt."} ...
+                              {stripHtml(filteredArticles[0].content).slice(
+                                0,
+                                100,
+                              ) || "Chưa có nội dung tóm tắt."}{" "}
+                              ...
                             </p>
                             <div className="mt-5">
                               <Button asChild>
                                 <Link to={filteredArticles[0].href}>
-                                  Đọc bài viết <ArrowRight className="h-4 w-4" />
+                                  Đọc bài viết{" "}
+                                  <ArrowRight className="h-4 w-4" />
                                 </Link>
                               </Button>
                             </div>
@@ -543,16 +688,22 @@ const Index = () => {
                       {filteredArticles.slice(1, 7).map(renderItemCard)}
                     </div>
                   </>
-                ) : (
-                  renderEmpty("Không có bài viết phù hợp", "Hãy thử bỏ bộ lọc hoặc tìm từ khoá khác.")
-                )}
+                : renderEmpty(
+                    "Không có bài viết phù hợp",
+                    "Hãy thử bỏ bộ lọc hoặc tìm từ khoá khác.",
+                  )
+                }
               </section>
-                {/*  */}
+              {/*  */}
               <section className="space-y-4">
                 <div className="flex items-end justify-between gap-4">
                   <div>
-                    <h2 className="font-display text-2xl font-bold">Hoạt động gần đây</h2>
-                    <p className="text-sm text-muted-foreground">Theo dõi các hoạt động mới nhất.</p>
+                    <h2 className="font-display text-2xl font-bold">
+                      Hoạt động gần đây
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      Theo dõi các hoạt động mới nhất.
+                    </p>
                   </div>
                   <Button asChild variant="ghost" size="sm">
                     <Link to="/activities">
@@ -560,18 +711,28 @@ const Index = () => {
                     </Link>
                   </Button>
                 </div>
-                {loading
-                  ? renderLoading()
-                  : filteredActivities.length
-                    ? <div className="grid gap-4 grid-cols-2">{filteredActivities.slice(0, 4).map(renderItemCard)}</div>
-                    : renderEmpty("Chưa có hoạt động", "Danh sách hoạt động đang trống.")}
+                {loading ?
+                  renderLoading()
+                : filteredActivities.length ?
+                  <div className="grid gap-4 grid-cols-2">
+                    {filteredActivities.slice(0, 4).map(renderItemCard)}
+                  </div>
+                : renderEmpty(
+                    "Chưa có hoạt động",
+                    "Danh sách hoạt động đang trống.",
+                  )
+                }
               </section>
 
               <section className="space-y-4">
                 <div className="flex items-end justify-between gap-4">
                   <div>
-                    <h2 className="font-display text-2xl font-bold">Lãnh đạo</h2>
-                    <p className="text-sm text-muted-foreground">Lữ đoàn trưởng và Chính ủy đương nhiệm.</p>
+                    <h2 className="font-display text-2xl font-bold">
+                      Lãnh đạo
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      Lữ đoàn trưởng và Chính ủy đương nhiệm.
+                    </p>
                   </div>
                   <Button asChild variant="ghost" size="sm">
                     <Link to="/leaders">
@@ -581,22 +742,35 @@ const Index = () => {
                 </div>
                 {(() => {
                   if (loading) return renderLoading();
-                  const sortNewest = (a: typeof leaders[number], b: typeof leaders[number]) =>
-                    new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+                  const sortNewest = (
+                    a: (typeof leaders)[number],
+                    b: (typeof leaders)[number],
+                  ) =>
+                    new Date(b.created_at).getTime() -
+                    new Date(a.created_at).getTime();
                   const commander = [...leaders]
                     .filter((l) => l.role?.trim() === "Lữ đoàn trưởng")
                     .sort(sortNewest)[0];
                   const commissar = [...leaders]
                     .filter((l) => l.role?.trim() === "Chính ủy")
                     .sort(sortNewest)[0];
-                  const featured = [commander, commissar].filter(Boolean) as typeof leaders;
+                  const featured = [commander, commissar].filter(
+                    Boolean,
+                  ) as typeof leaders;
                   if (!featured.length)
-                    return renderEmpty("Chưa có dữ liệu", "Hồ sơ lãnh đạo sẽ hiển thị tại đây.");
-                  return <div className="grid gap-4 md:grid-cols-2">{featured.map(renderLeaderCard)}</div>;
+                    return renderEmpty(
+                      "Chưa có dữ liệu",
+                      "Hồ sơ lãnh đạo sẽ hiển thị tại đây.",
+                    );
+                  return (
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {featured.map(renderLeaderCard)}
+                    </div>
+                  );
                 })()}
               </section>
             </div>
-          )}
+          }
         </div>
       </main>
 
