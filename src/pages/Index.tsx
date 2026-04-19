@@ -294,8 +294,12 @@ const Index = () => {
         </div>
         {/* <CardTitle className="font-display text-xl leading-snug"> */}
         {/* text - xl pc, text-lg mobile */}
-        <CardTitle className="font-display text-lg leading-snug p-2">
-          <Link to={item.href} className="hover:text-primary">
+        <CardTitle className="font-display text-lg leading-snug p-2 
+        [text-transform:capitalize]:first-letter
+
+
+        ">
+          <Link to={item.href} className="hover:text-primary ">
             {item.title}
           </Link>
         </CardTitle>
@@ -391,7 +395,7 @@ const Index = () => {
           Tìm
         </Button>
       </form>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex  items-center gap-2 justify-end">
         {showCategory && categories.length > 0 && (
           <Select value={categoryParam} onValueChange={(v) => updateParam("cat", v)}>
             <SelectTrigger className="h-9 w-[160px]"><SelectValue placeholder="Chuyên mục" /></SelectTrigger>

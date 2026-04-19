@@ -62,13 +62,15 @@ const Hero = () => {
             Lịch sử Lữ đoàn Thông tin 604
           </h1>
 
-          <p className="mt-6 max-w-2xl text-base leading-relaxed text-[hsl(var(--hero-foreground)/0.85)] md:text-lg">
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-[hsl(var(--hero-foreground)/0.85)] md:text-lg
+            text-justify
+          ">
             Hành trình hơn bốn thập kỷ xây dựng, chiến đấu và trưởng thành của Lữ đoàn Thông tin 604 –
             đơn vị bảo đảm thông tin liên lạc cho Bộ Tư lệnh Quân khu 2, gìn giữ và phát huy truyền thống
             anh hùng của Quân đội nhân dân Việt Nam.
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-wrap gap-3 justify-center">
             <Button asChild size="lg" className="bg-[hsl(var(--hero-foreground))] text-[hsl(var(--hero-bg))] hover:bg-[hsl(var(--hero-foreground)/0.9)]">
               <Link to="/lich-su">
                 Xem thêm <ArrowRight className="h-4 w-4" />
