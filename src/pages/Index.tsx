@@ -209,7 +209,21 @@ const Index = () => {
       )}
       <CardHeader>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Badge variant="outline">{item.category || (item.kind === "activity" ? "Hoạt động" : "Tin tức")}</Badge>
+          {/* <Badge variant="outline">{item.category || (item.kind === "activity" ? "Hoạt động" : "Tin tức")}</Badge> */}
+          {/* display 'tin-tuc' by 'Tin tức', 'thong-bao' by 'Thông báo', 'su-kien' by 'Sự kiện' */}
+          <Badge variant="outline">
+            {item.category === "tin-tuc"  
+              ? "Tin tức"
+              : item.category === "thong-bao"
+                ? "Thông báo"
+                : item.category === "su-kien"
+                  ? "Sự kiện"
+                  : item.category || (item.kind === "activity" ? "Hoạt động" : "Tin tức")}
+          </Badge>
+
+       
+
+            
           <span>{formatDate(item.created_at)}</span>
         </div>
         <CardTitle className="font-display text-xl leading-snug">
@@ -430,7 +444,10 @@ const Index = () => {
               {loading
                 ? renderLoading()
                 : filteredActivities.length
-                  ? <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{filteredActivities.map(renderItemCard)}</div>
+                  ? <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 
+
+                    text-sm
+                  ">{filteredActivities.map(renderItemCard)}</div>
                   : renderEmpty("Không có kết quả", "Hãy thử thay đổi từ khoá hoặc bộ lọc.")}
             </section>
           ) : isLeadersPage ? (
@@ -487,7 +504,19 @@ const Index = () => {
                           )}
                           <div className="flex flex-col justify-center p-6 md:p-8">
                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                              <Badge variant="outline">{filteredArticles[0].category || "Tin tức"}</Badge>
+                              {/* <Badge variant="outline">{filteredArticles[0].category || "Tin tức"}</Badge> */}
+
+                              {/* display 'tin-tuc' by 'Tin tức', 'thong-bao' by 'Thông báo', 'su-kien' by 'Sự kiện' */}
+                              <Badge variant="outline">
+                                {filteredArticles[0].category === "tin-tuc"  
+                                  ? "Tin tức" 
+                                  : filteredArticles[0].category === "thong-bao"
+                                    ? "Thông báo"
+                                    : filteredArticles[0].category === "su-kien"
+                                      ? "Sự kiện"
+                                      : filteredArticles[0].category || "Tin tức"}
+                              </Badge>
+                                  
                               <span>{formatDate(filteredArticles[0].created_at)}</span>
                             </div>
                             <h3 className="mt-3 font-display text-2xl font-semibold leading-snug md:text-3xl">
@@ -518,7 +547,7 @@ const Index = () => {
                   renderEmpty("Không có bài viết phù hợp", "Hãy thử bỏ bộ lọc hoặc tìm từ khoá khác.")
                 )}
               </section>
-
+                {/*  */}
               <section className="space-y-4">
                 <div className="flex items-end justify-between gap-4">
                   <div>
