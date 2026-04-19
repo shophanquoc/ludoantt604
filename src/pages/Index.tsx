@@ -208,7 +208,8 @@ const Index = () => {
         </Link>
       )}
       <CardHeader>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="flex items-center gap-1 text-xs  text-muted-foreground">
+          {/* gap-1 mean */}
           {/* <Badge variant="outline">{item.category || (item.kind === "activity" ? "Hoạt động" : "Tin tức")}</Badge> */}
           {/* display 'tin-tuc' by 'Tin tức', 'thong-bao' by 'Thông báo', 'su-kien' by 'Sự kiện' */}
           <Badge variant="outline">
@@ -221,17 +222,16 @@ const Index = () => {
                   : item.category || (item.kind === "activity" ? "Hoạt động" : "Tin tức")}
           </Badge>
 
-       
-
-            
           <span>{formatDate(item.created_at)}</span>
         </div>
-        <CardTitle className="font-display text-xl leading-snug">
+        {/* <CardTitle className="font-display text-xl leading-snug"> */}
+          {/* text - xl pc, text-lg mobile */}
+        <CardTitle className="font-display text-lg leading-snug">
           <Link to={item.href} className="hover:text-primary">
             {item.title}
           </Link>
         </CardTitle>
-        <CardDescription>{stripHtml(item.content).slice(0, 100) || "Chưa có nội dung tóm tắt."}</CardDescription>
+        <CardDescription>{stripHtml(item.content).slice(0, 10) || "Chưa có nội dung tóm tắt."} ...</CardDescription>
       </CardHeader>
       <CardContent>
         <Button asChild variant="outline">
@@ -260,7 +260,7 @@ const Index = () => {
       </CardHeader>
       {leader.info && (
         <CardContent>
-          <p className="text-sm text-muted-foreground">{stripHtml(leader.info).slice(0, 100)}</p>
+          <p className="text-sm text-muted-foreground">{stripHtml(leader.info).slice(0, 100)}...</p>
         </CardContent>
       )}
     </Card>
@@ -525,7 +525,7 @@ const Index = () => {
                               </Link>
                             </h3>
                             <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">
-                              {stripHtml(filteredArticles[0].content).slice(0, 100) || "Chưa có nội dung tóm tắt."}
+                              {stripHtml(filteredArticles[0].content).slice(0, 100) || "Chưa có nội dung tóm tắt."} ...
                             </p>
                             <div className="mt-5">
                               <Button asChild>
