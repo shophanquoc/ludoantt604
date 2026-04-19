@@ -542,7 +542,7 @@ const Index = () => {
                 <div className="flex items-end justify-between gap-4">
                   <div>
                     <h2 className="font-display text-2xl font-bold">Lãnh đạo</h2>
-                    <p className="text-sm text-muted-foreground">Hai lãnh đạo mới nhất của đơn vị.</p>
+                    <p className="text-sm text-muted-foreground">Lữ đoàn trưởng và Chính ủy đương nhiệm.</p>
                   </div>
                   <Button asChild variant="ghost" size="sm">
                     <Link to="/leaders">
@@ -550,11 +550,21 @@ const Index = () => {
                     </Link>
                   </Button>
                 </div>
-                {loading
-                  ? renderLoading()
-                  : leaders.length
-                    ? <div className="grid gap-4 md:grid-cols-2">{leaders.slice(0, 2).map(renderLeaderCard)}</div>
-                    : renderEmpty("Chưa có dữ liệu", "Hồ sơ lãnh đạo sẽ hiển thị tại đây.")}
+                {(() => {
+                  if (loading) return renderLoading();
+                  const sortNewest = (a: typeof leaders[number], b: typeof leaders[number]) =>
+                    new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+                  const commander = [...leaders]
+                    .filter((l) => l.role?.trim() === "Lữ đoàn trưởng")
+                    .sort(sortNewest)[0];
+                  const commissar = [...leaders]
+                    .filter((l) => l.role?.trim() === "Chính ủy")
+                    .sort(sortNewest)[0];
+                  const featured = [commander, commissar].filter(Boolean) as typeof leaders;
+                  if (!featured.length)
+                    return renderEmpty("Chưa có dữ liệu", "Hồ sơ lãnh đạo sẽ hiển thị tại đây.");
+                  return <div className="grid gap-4 md:grid-cols-2">{featured.map(renderLeaderCard)}</div>;
+                })()}
               </section>
             </div>
           )}
