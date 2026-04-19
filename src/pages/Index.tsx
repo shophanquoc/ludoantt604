@@ -231,7 +231,7 @@ const Index = () => {
             {item.title}
           </Link>
         </CardTitle>
-        <CardDescription>{stripHtml(item.content).slice(0, 140) || "Chưa có nội dung tóm tắt."}</CardDescription>
+        <CardDescription>{stripHtml(item.content).slice(0, 100) || "Chưa có nội dung tóm tắt."}</CardDescription>
       </CardHeader>
       <CardContent>
         <Button asChild variant="outline">
@@ -260,7 +260,7 @@ const Index = () => {
       </CardHeader>
       {leader.info && (
         <CardContent>
-          <p className="text-sm text-muted-foreground">{stripHtml(leader.info).slice(0, 180)}</p>
+          <p className="text-sm text-muted-foreground">{stripHtml(leader.info).slice(0, 100)}</p>
         </CardContent>
       )}
     </Card>
@@ -525,7 +525,7 @@ const Index = () => {
                               </Link>
                             </h3>
                             <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">
-                              {stripHtml(filteredArticles[0].content).slice(0, 220) || "Chưa có nội dung tóm tắt."}
+                              {stripHtml(filteredArticles[0].content).slice(0, 100) || "Chưa có nội dung tóm tắt."}
                             </p>
                             <div className="mt-5">
                               <Button asChild>
