@@ -51,8 +51,9 @@ const SiteHeader = () => {
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
         <Link to="/" className="flex items-center gap-2 text-left">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <ShieldCheck className="h-5 w-5" />
+          <div className="flex h-9 w-9 items-center justify-center">
+            {/* <ShieldCheck className="h-5 w-5" /> */}
+{/* favicon.ico */} < img src="/favicon.ico" alt="Logo" className="h-9 w-9 rounded-lg" />
           </div>
           <div className="">
             <p className="font-display text-base font-semibold leading-tight">Lữ đoàn 604</p>
@@ -116,9 +117,10 @@ const SiteHeader = () => {
           <SheetContent side="left" className="w-[300px] p-0">
             <div className="flex h-full flex-col">
               <div className="flex items-center gap-2 p-5 pr-12">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground"> 
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg  text-primary-foreground"> 
                 
-                  <ShieldCheck className="h-5 w-5"   />
+                  {/* <ShieldCheck className="h-5 w-5"   />  */}
+                  {/* favicon.ico */} < img src="/favicon.ico" alt="Logo" className="h-9 w-9 rounded-lg" />
                 </div>
                 <div>
                   <p className="font-display text-base font-semibold leading-tight">Lữ đoàn 604</p>

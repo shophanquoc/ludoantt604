@@ -75,8 +75,10 @@ const Login = () => {
     <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground">
-            <ShieldCheck className="h-5 w-5" />
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full  text-primary-foreground">
+            {/* <ShieldCheck className="h-5 w-5" /> */}
+            {/* favicon.ico */} < img src="/favicon.ico" alt="Logo" className="h-9 w-9 rounded-lg" />
+
           </div>
           <CardTitle className="text-center text-2xl">Đăng nhập quản trị</CardTitle>
           <CardDescription className="text-center">

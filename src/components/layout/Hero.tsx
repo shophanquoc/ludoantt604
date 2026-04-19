@@ -15,9 +15,9 @@ const Hero = () => {
         className="absolute inset-0 -z-10 opacity-60"
         style={{
     background: `
-      radial-gradient(800px 400px at 80% -10%, rgba(102, 201, 255, 0.83), transparent 60%),
-      radial-gradient(600px 300px at 0% 100%, rgba(147, 58, 231, 0.56), transparent 60%),
-      #FFF5EE
+      radial-gradient(800px 400px at 80% -10%, rgb(244, 193, 193), transparent 60%),
+      radial-gradient(600px 300px at 0% 100%, rgb(244, 182, 182), transparent 60%),
+      #FFD700
     `,
   }}
         // style={{
@@ -36,13 +36,18 @@ const Hero = () => {
         }}
       />
 
-      <div className="mx-auto max-w-6xl px-4 py-20 md:py-28 lg:py-32" >
+      <div className="mx-auto max-w-6xl px-4 py-10 md:py-28 lg:py-32" >
 
         <div className="max-w-3xl text-[hsl(var(--hero-foreground))]">
-          <span   style={{ color: "#FFD700" }}
+          <span   style={{ color: "#FFD700",backgroundColor: "#D32F3F" }}
           className="
          
-          inline-flex items-center gap-2 rounded-full border border-[hsl(var(--hero-foreground)/0.25)] bg-[hsl(var(--hero-foreground)/0.06)] px-3 py-1 text-xs font-medium uppercase tracking-wider text-[hsl(var(--hero-foreground)/0.85)]">
+          inline-flex items-center gap-2 rounded-full border border-[hsl(var(--hero-foreground)/0.25)] b
+          g-[hsl(var(--hero-foreground)/0.06)] px-3 py-1 text-xs font-medium uppercase tracking-wider
+           text-[hsl(var(--hero-foreground)/0.85)]"
+
+           
+           >
             <Sparkles className="h-3.5 w-3.5" />
             Kỷ niệm truyền thống
           </span>
