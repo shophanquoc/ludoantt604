@@ -534,7 +534,7 @@ const Index = () => {
                 {loading
                   ? renderLoading()
                   : filteredActivities.length
-                    ? <div className="grid gap-4 md:grid-cols-2">{filteredActivities.slice(0, 4).map(renderItemCard)}</div>
+                    ? <div className="grid gap-4 grid-cols-2">{filteredActivities.slice(0, 4).map(renderItemCard)}</div>
                     : renderEmpty("Chưa có hoạt động", "Danh sách hoạt động đang trống.")}
               </section>
 
