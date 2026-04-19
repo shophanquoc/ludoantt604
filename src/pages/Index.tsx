@@ -510,7 +510,7 @@ const Index = () => {
                       </Card>
                     )}
 
-                    <div className="grid gap-4 md:grid-cols-2">
+                    <div className="grid gap-4 grid-cols-2">
                       {filteredArticles.slice(1, 7).map(renderItemCard)}
                     </div>
                   </>
