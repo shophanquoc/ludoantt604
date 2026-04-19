@@ -1,6 +1,19 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, Search, LogIn, Moon, Sun, ShieldCheck, History, Newspaper, CalendarDays, Users, Home, Filter } from "lucide-react";
+import {
+  Menu,
+  Search,
+  LogIn,
+  Moon,
+  Sun,
+  ShieldCheck,
+  History,
+  Newspaper,
+  CalendarDays,
+  Users,
+  Home,
+  Filter,
+} from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -53,11 +66,16 @@ const SiteHeader = () => {
         <Link to="/" className="flex items-center gap-2 text-left">
           <div className="flex h-9 w-9 items-center justify-center">
             {/* <ShieldCheck className="h-5 w-5" /> */}
-{/* favicon.ico */} < img src="/favicon.ico" alt="Logo" className="h-9 w-9 rounded-lg" />
+            {/* favicon.ico */}{" "}
+            <img src="/favicon.ico" alt="Logo" className="h-9 w-9 rounded-lg" />
           </div>
           <div className="">
-            <p className="font-display text-base font-semibold leading-tight">Lữ đoàn 604</p>
-            <p className="hidden sm:block text-xs text-muted-foreground">Lịch sử & truyền thống</p>
+            <p className="font-display text-base font-semibold leading-tight">
+              Lữ đoàn 604
+            </p>
+            <p className="hidden sm:block text-xs text-muted-foreground">
+              Lịch sử & truyền thống
+            </p>
           </div>
         </Link>
 
@@ -74,7 +92,10 @@ const SiteHeader = () => {
           ))}
         </nav>
 
-        <form onSubmit={submitSearch} className="ml-auto hidden items-center md:flex">
+        <form
+          onSubmit={submitSearch}
+          className="ml-auto hidden items-center md:flex"
+        >
           <div className="relative">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -83,6 +104,8 @@ const SiteHeader = () => {
               placeholder="Tìm bài viết..."
               className="h-9 w-44 pl-8 lg:w-56"
               aria-label="Tìm kiếm"
+              // no auto focus on mobile to avoid keyboard pop-up
+              autoFocus={false}
             />
           </div>
         </form>
@@ -94,7 +117,9 @@ const SiteHeader = () => {
           aria-label="Chuyển chế độ sáng/tối"
           className="hidden md:inline-flex"
         >
-          {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          {theme === "dark" ?
+            <Sun className="h-4 w-4" />
+          : <Moon className="h-4 w-4" />}
         </Button>
 
         <Button
@@ -110,21 +135,34 @@ const SiteHeader = () => {
 
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
-            <Button variant="outline" size="icon" className="ml-auto md:ml-0 lg:hidden" aria-label="Mở menu">
+            <Button
+              variant="outline"
+              size="icon"
+              className="ml-auto md:ml-0 lg:hidden"
+              aria-label="Mở menu"
+            >
               <Menu className="h-4 w-4" />
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-[300px] p-0">
             <div className="flex h-full flex-col">
               <div className="flex items-center gap-2 p-5 pr-12">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg  text-primary-foreground"> 
-                
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg  text-primary-foreground">
                   {/* <ShieldCheck className="h-5 w-5"   />  */}
-                  {/* favicon.ico */} < img src="/favicon.ico" alt="Logo" className="h-9 w-9 rounded-lg" />
+                  {/* favicon.ico */}{" "}
+                  <img
+                    src="/favicon.ico"
+                    alt="Logo"
+                    className="h-9 w-9 rounded-lg"
+                  />
                 </div>
                 <div>
-                  <p className="font-display text-base font-semibold leading-tight">Lữ đoàn 604</p>
-                  <p className="text-xs text-muted-foreground">QK2 - Thông tin</p>
+                  <p className="font-display text-base font-semibold leading-tight">
+                    Lữ đoàn 604
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    QK2 - Thông tin
+                  </p>
                 </div>
               </div>
               <Separator />
@@ -153,7 +191,9 @@ const SiteHeader = () => {
                       <SelectItem value="365d">1 năm qua</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Button type="submit" size="sm">Tìm</Button>
+                  <Button type="submit" size="sm">
+                    Tìm
+                  </Button>
                 </div>
               </form>
 
@@ -190,7 +230,9 @@ const SiteHeader = () => {
               <div className="space-y-2 p-4">
                 <div className="flex items-center justify-between rounded-lg border px-3 py-2">
                   <div className="flex items-center gap-2 text-sm">
-                    {theme === "dark" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+                    {theme === "dark" ?
+                      <Moon className="h-4 w-4" />
+                    : <Sun className="h-4 w-4" />}
                     <span>Chế độ tối</span>
                   </div>
                   <Button variant="outline" size="sm" onClick={toggleTheme}>
